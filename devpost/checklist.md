@@ -5,11 +5,11 @@ status: approved
 
 # Build Checklist
 
-Build mode: [not chosen yet]
+Build mode: fast
 
 ## Slices
 
-- [ ] **1. Paste text and get real key points for chunk 1**
+- [x] **1. Paste text and get real key points for chunk 1**
   Becomes usable: Run `npm start`, open http://localhost:3000, paste some notes on the Home Page, press **Start studying**, see the loading ring, then see 3–5 key points for the first chunk with important terms highlighted, in the calm dark-blue style.
   Why now: This is the core of the app and its biggest risk: Claude turning one chunk into a study round. It also sets up the project (server, page, state + render pattern, colors and font), so every later slice has somewhere to land. Paste text comes before PDF because it needs nothing extra.
   PRD ref: `prd.md > The Core Journey` (steps 3–5), `prd.md > Chunking`, `prd.md > Summary`, `prd.md > Loading`, `prd.md > Look and Feel`
@@ -81,3 +81,8 @@ Reflection: [not started]
 Activity mode: [not started]
 
 ## Revisions
+
+- `npm start` uses `--env-file-if-exists=.env` instead of `--env-file=.env` — with the strict flag Node crashes when `.env` is missing, so the helper could never print its clear "key is missing" message.
+- The helper reads an optional `PORT` (default 3000) — needed to test the missing-key path alongside the running app, and hosts in `6-ship` set `PORT` themselves.
+- Structured outputs cannot enforce exact list lengths (confirmed in the docs); the helper's count checks in `server/studyRound.js` cover it, as the spec anticipated.
+- Current Opus 5.5 pricing confirmed at $4 / $20 per million tokens; a real test chunk took about 14 seconds.
