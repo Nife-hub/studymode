@@ -82,6 +82,7 @@ Package versions: use the latest stable at build time. **Check early in the buil
   6. Next chunk appears
   - Keep `sample/sample-notes.pdf` in the repo as a demo PDF that's known to work.
 - **Hosting is optional and decided in `6-ship`.** Hosting is free; Claude usage is what costs money, so keep the spending limit. Because the helper is a normal Express app, hosts that run Node apps (for example Render or Railway) can run it as is. Netlify or Vercel would need the single route moved into a serverless function.
+- **Sharing (`6-ship`):** public repo https://github.com/Nife-hub/studymode. Live app on Render's free plan at https://studymode.onrender.com/ (*learner's choice*; build `npm install`, start `node server/index.js`, `ANTHROPIC_API_KEY` set in Render's settings, sleeps after about 15 minutes idle). Demo video: _to be added_.
 
 ## Look and Feel
 Implements `prd.md > Look and Feel`. The learner chose dark blues and a clean font, then at the final review asked for a friendlier, more casual look, a dark mode, and a subtle study-themed background.
