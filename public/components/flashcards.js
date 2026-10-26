@@ -26,6 +26,7 @@ export function flashcardsView(state, actions) {
     el("div", { class: "flashcards" }, cards.map(flashcard)),
     el("div", { class: "actions" }, [
       el("button", { class: "button secondary", onClick: () => actions.setStep("summary") }, "Back to key points"),
+      el("button", { class: "button", onClick: () => actions.setStep("quiz") }, "Go to quiz"),
     ]),
   ]);
 }

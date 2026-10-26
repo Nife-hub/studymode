@@ -4,6 +4,7 @@ import { fetchStudyRound } from "./lib/api.js";
 import { readPdf } from "./lib/readPdf.js";
 import { homeScreen } from "./screens/home.js";
 import { studyScreen } from "./screens/study.js";
+import { finishedScreen } from "./screens/finished.js";
 import { loadingView } from "./components/loading.js";
 
 const freshState = () => ({
@@ -15,6 +16,10 @@ const freshState = () => ({
   ownCards: {},
   cardCount: 5,
   editingCard: false,
+  quizPos: 0,
+  picked: null,
+  chunkScore: { correct: 0, total: 5 },
+  sessionScore: { correct: 0, total: 0 },
   error: null,
 });
 
@@ -24,6 +29,7 @@ const screens = {
   home: homeScreen,
   loading: loadingView,
   study: studyScreen,
+  finished: finishedScreen,
 };
 
 let lastView = "";
@@ -47,7 +53,14 @@ async function loadRound() {
   update({ screen: "loading", error: null });
   try {
     const round = await fetchStudyRound(state.chunks[state.chunkIndex], state.chunkIndex + 1, state.chunks.length);
-    update({ screen: "study", round, step: "summary" });
+    update({
+      screen: "study",
+      round,
+      step: "summary",
+      quizPos: 0,
+      picked: null,
+      chunkScore: { correct: 0, total: round.quiz.length },
+    });
   } catch (err) {
     update({ screen: "home", error: err.message });
   }
@@ -96,6 +109,40 @@ const actions = {
 
   setCardCount(cardCount) {
     update({ cardCount });
+  },
+
+  answerQuestion(i) {
+    if (state.picked !== null) return;
+    const right = i === state.round.quiz[state.quizPos].correctIndex;
+    const { correct, total } = state.chunkScore;
+    update({ picked: i, chunkScore: { correct: correct + (right ? 1 : 0), total } });
+  },
+
+  // After the last question, the chunk's score is added to the session score.
+  nextQuestion() {
+    if (state.quizPos < state.round.quiz.length - 1) {
+      update({ quizPos: state.quizPos + 1, picked: null });
+      return;
+    }
+    const { correct, total } = state.sessionScore;
+    update({
+      step: "score",
+      sessionScore: { correct: correct + state.chunkScore.correct, total: total + state.chunkScore.total },
+    });
+  },
+
+  nextChunk() {
+    if (state.chunkIndex >= state.chunks.length - 1) {
+      update({ screen: "finished" });
+      return;
+    }
+    state = { ...state, chunkIndex: state.chunkIndex + 1 };
+    loadRound();
+  },
+
+  startOver() {
+    state = freshState();
+    render();
   },
 };
 

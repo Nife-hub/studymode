@@ -2,13 +2,14 @@
 import { el } from "../lib/dom.js";
 import { summaryView } from "../components/summary.js";
 import { flashcardsView } from "../components/flashcards.js";
+import { quizView, scoreView } from "../components/quiz.js";
 
 const STEP_LABELS = { summary: "Summary", flashcards: "Flashcards", quiz: "Quiz", score: "Score" };
 
 export function studyScreen(state, actions) {
   const chunkNumber = state.chunkIndex + 1;
   const total = state.chunks.length;
-  const steps = { summary: summaryView, flashcards: flashcardsView };
+  const steps = { summary: summaryView, flashcards: flashcardsView, quiz: quizView, score: scoreView };
 
   return el("main", { class: "screen" }, [
     el("p", { class: "progress" }, `Chunk ${chunkNumber} of ${total} · ${STEP_LABELS[state.step]}`),

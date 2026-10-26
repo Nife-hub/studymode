@@ -39,7 +39,7 @@ Build mode: fast
   Learner check: Make one card of your own, go to flashcards, choose 5, and tap a few cards. You should see 5 cards plus yours, and each should flip smoothly to show the answer.
   Commit: `Add flashcards with count picker and your own cards`
 
-- [ ] **4. Take the quiz, see your score, and move to the next chunk**
+- [x] **4. Take the quiz, see your score, and move to the next chunk**
   Becomes usable: The full study loop. After flashcards, answer 5 questions one at a time with **Correct** / **Not quite** feedback, see the chunk score and session score, press **Next chunk** to get chunk 2's round, and after the last chunk see the **Finished Screen** with the total score and **Upload another PDF**.
   Why now: This closes the loop that makes StudyMode different: small rounds, one after another, with a score. Once it's in, the whole core journey works end to end.
   PRD ref: `prd.md > The Core Journey` (steps 7–9), `prd.md > Quiz and Score`, `prd.md > Finished Screen`
@@ -91,3 +91,4 @@ Activity mode: [not started]
 - `sample/sample-notes.pdf` (human heart and circulation notes, 4 pages) was generated with a one-off dependency-free script rather than added by hand.
 - The "How many cards?" picker stays above the cards so changing the count updates them instantly, instead of a separate ask-first screen; `state.editingCard` was added to the Data Model to show or hide the own-card editor.
 - From slice 3 on, browser behavior is verified mechanically by loading the real `public/app.js` in jsdom (a simulated browser, kept outside the project) with a faked `/api/study-round`, and clicking through the slice. Visual details such as the flip animation are confirmed by the learner at the final review.
+- `state.picked` (the option chosen for the current question) was added to the Data Model so answers lock and feedback shows; the button after question 5 reads **See my score**.
