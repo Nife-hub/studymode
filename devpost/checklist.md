@@ -62,29 +62,31 @@ Build mode: fast
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 1: first real key points from Claude, plus the look and feel. Feedback: it works, but the background was too bright for long study sessions; darkened it.
-- [ ] Final kick-the-tires exploration and feedback completed
+- [x] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
 
-- [ ] Dark mode — follows the system setting, with a toggle button
-- [ ] Friendlier, more casual look — rounder shapes, softer feel, casual heading font
-- [ ] Catchy, short description for students (Opening tagline and Home headline)
-- [ ] Subtle study-themed background design that isn't distracting
-- [ ] Remove "The file stays on your computer…" line from the upload box
-- [ ] Soft shadow on the upload section
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [x] Dark mode — follows the system setting, with a toggle button
+- [x] Friendlier, more casual look — rounder shapes, softer feel, casual heading font
+- [x] Catchy, short description for students (Opening tagline and Home headline)
+- [x] Subtle study-themed background design that isn't distracting
+- [x] Remove "The file stays on your computer…" line from the upload box
+- [x] Soft shadow on the upload section
+- [x] Final review complete — feedback resolved and learner confirms ready to ship
+
+Review notes: the learner tried the full journey in a real browser, including PDF upload and the restyle ("it works"). A 100-page PDF gave the unusable-file message. A generated 95-page, 42,000-word PDF read fine (67 chunks), so size isn't the cause; the likely cause is a scanned PDF, which is a PRD Non-Goal. The learner chose to leave it as is; separate messages for scanned and unopenable PDFs were offered and declined.
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [x] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: [not started]
-Route and stops: [not started]
-Edit outcome: [not started]
-Reflection: [not started]
-Activity mode: [not started]
+Activity and evidence: Brief evidence-based recap, because the learner was short on time and asked to wrap up. It connects their design goal to the build: two plain-language look-and-feel requests ("too bright", then "too bland / more casual") became edits to the variables at the top of `public/styles.css`, with `spec.md > Look and Feel` kept in sync and contrast checked at 4.5:1 or better. A related moment: the 100-page PDF guess ("too large?") was tested with a generated 95-page PDF before changing any code.
+Route and stops: Reference route only, not toured: `public/screens/home.js` (`startFromPdf`) → `public/app.js` (`startFromPdf`, `loadRound`) → `server/studyRound.js` (`makeStudyRound`, `SYSTEM_PROMPT`, `checkCounts`).
+Edit outcome: Not applicable, since the learner asked to wrap up; the map lists where to make common changes.
+Reflection: Offered once as optional in the wrap-up message.
+Activity mode: Recap (no hands-on practice in the wrap-up).
 
 ## Revisions
 

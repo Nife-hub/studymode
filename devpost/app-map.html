@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudyMode App Map</title>
+<style>
+  :root {
+    --bg: #dce3ec; --surface: #f4f7fa; --text: #13243b; --soft: #4b5d74;
+    --primary: #1f3b63; --accent: #d6e2f1; --border: #c5d0de; --code: #e6ecf4;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101826; --surface: #18233a; --text: #e3e9f2; --soft: #a3b3c9;
+      --primary: #9dbcf2; --accent: #253552; --border: #2b3a55; --code: #1f2c45;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 40px 16px 64px; }
+  h1, h2 { color: var(--primary); line-height: 1.25; }
+  h1 { font-size: 2rem; margin: 0 0 4px; }
+  h2 { font-size: 1.3rem; margin: 36px 0 12px; }
+  p { margin: 0 0 12px; }
+  .soft { color: var(--soft); }
+  section, .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 22px; margin-top: 16px; }
+  section > h2:first-child { margin-top: 0; }
+  code { background: var(--code); padding: 1px 6px; border-radius: 6px; font: 0.9em ui-monospace, "Cascadia Mono", Consolas, monospace; overflow-wrap: anywhere; }
+  ol.route { padding-left: 22px; margin: 0; }
+  ol.route li { margin-bottom: 14px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--primary); font-size: 0.9rem; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; color: var(--primary); font-weight: 600; }
+  summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  svg { width: 100%; height: auto; display: block; }
+  .box { fill: var(--surface); stroke: var(--primary); stroke-width: 1.5; }
+  .ext { fill: var(--accent); stroke: var(--primary); stroke-width: 1.5; stroke-dasharray: 5 4; }
+  .t { fill: var(--text); font: 600 13px system-ui, sans-serif; }
+  .s { fill: var(--soft); font: 11px ui-monospace, Consolas, monospace; }
+  .arrow { stroke: var(--primary); stroke-width: 1.5; fill: none; marker-end: url(#head); }
+  .head { fill: var(--primary); }
+  .scroll { overflow-x: auto; }
+  .scroll svg { min-width: 560px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>StudyMode: App Map</h1>
+  <p class="soft">A one-page guide to how your app fits together and where to make changes. It's a snapshot of commit <code>b143b91</code>, so it may drift as the code changes.</p>
+
+  <section aria-labelledby="what">
+    <h2 id="what">What it is, in two parts</h2>
+    <p><strong>The page you see</strong> (<code>public/</code>) is plain HTML, CSS and JavaScript. It reads your PDF in the browser, cuts the text into chunks of about 600–800 words, and shows the screens. Everything you're doing right now lives in one object called <code>state</code> in <code>public/app.js</code>. Each change to <code>state</code> goes through a small <em>action</em> function and then redraws the page with <code>render()</code>.</p>
+    <p><strong>The helper server</strong> (<code>server/</code>) hands the page to your browser and keeps your Claude API key private. For each chunk you study, it asks Claude for key points, 10 flashcards and a 5-question quiz.</p>
+  </section>
+
+  <section aria-labelledby="flow">
+    <h2 id="flow">One action, end to end: upload a PDF → see key points</h2>
+    <div class="scroll">
+    <svg viewBox="0 0 700 250" role="img" aria-labelledby="flow-title flow-desc">
+      <title id="flow-title">Path of a PDF upload through StudyMode</title>
+      <desc id="flow-desc">The upload box in home.js calls startFromPdf in app.js, which uses readPdf and chunkText, then fetchStudyRound sends one chunk to the helper server. makeStudyRound in server/studyRound.js asks Claude, and the reply is shown by summary.js.</desc>
+      <defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0 0 L10 5 L0 10 Z"/></marker></defs>
+      <rect class="box" x="10" y="20" width="160" height="58" rx="12"/>
+      <text class="t" x="24" y="44">1. Choose a PDF</text>
+      <text class="s" x="24" y="64">screens/home.js</text>
+      <rect class="box" x="210" y="20" width="200" height="58" rx="12"/>
+      <text class="t" x="224" y="44">2. Read + cut into chunks</text>
+      <text class="s" x="224" y="64">app.js → readPdf, chunkText</text>
+      <rect class="box" x="450" y="20" width="240" height="58" rx="12"/>
+      <text class="t" x="464" y="44">3. Send chunk 1 to the helper</text>
+      <text class="s" x="464" y="64">lib/api.js → fetchStudyRound</text>
+      <rect class="box" x="450" y="160" width="240" height="58" rx="12"/>
+      <text class="t" x="464" y="184">4. Helper asks Claude</text>
+      <text class="s" x="464" y="204">server/studyRound.js</text>
+      <rect class="ext" x="230" y="160" width="160" height="58" rx="12"/>
+      <text class="t" x="244" y="184">Claude (Anthropic)</text>
+      <text class="s" x="244" y="204">uses your API key</text>
+      <rect class="box" x="10" y="160" width="180" height="58" rx="12"/>
+      <text class="t" x="24" y="184">5. Key points appear</text>
+      <text class="s" x="24" y="204">components/summary.js</text>
+      <path class="arrow" d="M170 49 H206"/>
+      <path class="arrow" d="M410 49 H446"/>
+      <path class="arrow" d="M570 78 V156"/>
+      <path class="arrow" d="M450 182 H394"/>
+      <path class="arrow" d="M390 200 H450" />
+      <path class="arrow" d="M450 210 C330 240 250 240 194 205"/>
+    </svg>
+    </div>
+  </section>
+
+  <section aria-labelledby="route">
+    <h2 id="route">Reference route: three stops to read</h2>
+    <p class="soft">You didn't take this tour during the build. You can follow it yourself any time: open each file and search for the name in <code>code</code>.</p>
+    <ol class="route">
+      <li><strong><code>public/screens/home.js</code>, search for <code>startFromPdf</code>.</strong> Choosing a file in the upload box calls this action. The screen itself never changes data; it just asks <code>app.js</code> to.</li>
+      <li><strong><code>public/app.js</code>, search for <code>startFromPdf</code>, then <code>loadRound</code>.</strong> <code>startFromPdf</code> pulls the text out with <code>readPdf</code>, cuts it with <code>chunkText</code>, and <code>loadRound</code> shows the loading ring while it fetches chunk 1. When the reply arrives, it puts it in <code>state.round</code> and redraws, so the Study Screen appears.</li>
+      <li><strong><code>server/studyRound.js</code>, search for <code>makeStudyRound</code>.</strong> This is the only place that talks to Claude. <code>SYSTEM_PROMPT</code> tells Claude what to write, and <code>checkCounts</code> makes sure there are 3–5 key points, 10 flashcards and 5 quiz questions before anything reaches the page.</li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="change">
+    <h2 id="change">To change this, start here</h2>
+    <table>
+      <thead><tr><th scope="col">If you want to change…</th><th scope="col">Go to</th></tr></thead>
+      <tbody>
+        <tr><td>Colors, light or dark</td><td><code>public/styles.css</code>: the variables at the top (<code>:root</code>), and the dark set under <code>:root[data-theme="dark"]</code> and the <code>prefers-color-scheme: dark</code> block. Change both dark blocks together.</td></tr>
+        <tr><td>Heading font</td><td>The Google Fonts <code>&lt;link&gt;</code> in <code>public/index.html</code> and <code>--font-heading</code> in <code>public/styles.css</code></td></tr>
+        <tr><td>Opening and Home wording</td><td><code>public/screens/opening.js</code>; <code>public/screens/home.js</code> (the headline and the <code>STEPS</code> list)</td></tr>
+        <tr><td>What Claude writes, and its tone</td><td><code>SYSTEM_PROMPT</code> in <code>server/studyRound.js</code></td></tr>
+        <tr><td>How long a chunk is</td><td><code>TARGET</code> and <code>MAX</code> in <code>public/lib/chunkText.js</code></td></tr>
+        <tr><td>Which Claude model (cost vs quality)</td><td><code>model:</code> in <code>server/studyRound.js</code></td></tr>
+        <tr><td>Quiz encouragement messages</td><td><code>encouragement</code> in <code>public/components/quiz.js</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section aria-labelledby="practice">
+    <h2 id="practice">A practice to reuse: describe the feeling, keep design decisions in one place</h2>
+    <p>Every look-and-feel change in this build started as a plain description from trying the running app: "too bright for a long session", then "too bland, make it friendly and casual". Each one landed in the same place, the color and font variables at the top of <code>public/styles.css</code>. <code>spec.md › Look and Feel</code> was updated each time so the documents and the app agree. Before shipping, every text color was checked against the 4.5:1 contrast standard in both modes.</p>
+    <p>On your next project, have the agent set up design <em>variables</em> early, then react to the real thing in plain words ("too bright", "too busy"). A whole-app change becomes a few edits in one file, and you can tell the agent exactly where to look.</p>
+    <details>
+      <summary>Related: test a guess before acting on it</summary>
+      <p>When a 100-page PDF failed, the first guess was "it's too big". Instead of changing code, the agent made a 95-page test PDF and ran it through <code>public/lib/readPdf.js</code>. It worked (67 chunks), which ruled size out and pointed to a scanned PDF. Asking an agent to <em>check</em> a guess first is often faster than fixing the wrong thing.</p>
+    </details>
+  </section>
+
+  <section aria-labelledby="run">
+    <h2 id="run">Run it again</h2>
+    <p>In the <code>studymode</code> folder: <code>npm start</code>, then open <code>http://localhost:3000</code>. Your key lives in <code>.env</code>, which git ignores. A PDF known to work is in <code>sample/sample-notes.pdf</code>.</p>
+  </section>
+</main>
+</body>
+</html>
