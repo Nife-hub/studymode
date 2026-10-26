@@ -217,3 +217,128 @@ mark {
   text-align: center;
   color: var(--text-soft);
 }
+
+/* Own flashcard editor */
+.own-card-editor {
+  margin-top: 20px;
+}
+
+.own-card-editor label {
+  display: block;
+  margin: 12px 0 6px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+}
+
+input[type="text"]:focus {
+  outline: 2px solid var(--accent);
+  border-color: var(--primary);
+}
+
+textarea.short {
+  min-height: 100px;
+}
+
+.small { font-size: 0.9rem; margin: 8px 0 0; }
+.hint { margin: 20px 0 12px; font-size: 0.95rem; }
+
+/* Flashcard count picker */
+.count-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.count {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.count:hover { border-color: var(--primary); }
+
+.count.selected {
+  background: var(--accent);
+  border-color: var(--primary);
+}
+
+/* Flashcards that flip */
+.flashcards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.flashcard {
+  all: unset;
+  display: block;
+  cursor: pointer;
+  perspective: 1000px;
+  min-height: 170px;
+  border-radius: var(--radius);
+}
+
+.flashcard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.flashcard-inner {
+  position: relative;
+  height: 100%;
+  min-height: 170px;
+  transition: transform 0.4s ease;
+  transform-style: preserve-3d;
+}
+
+.flashcard.flipped .flashcard-inner {
+  transform: rotateY(180deg);
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  backface-visibility: hidden;
+  overflow-y: auto;
+}
+
+.face.back {
+  transform: rotateY(180deg);
+  background: var(--accent);
+}
+
+.face p { margin: 0; }
+
+.face-label {
+  position: absolute;
+  top: 12px;
+  left: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}

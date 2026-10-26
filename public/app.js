@@ -12,6 +12,9 @@ const freshState = () => ({
   chunkIndex: 0,
   round: null,
   step: "summary",
+  ownCards: {},
+  cardCount: 5,
+  editingCard: false,
   error: null,
 });
 
@@ -23,10 +26,15 @@ const screens = {
   study: studyScreen,
 };
 
+let lastView = "";
+
 function render() {
   const app = document.getElementById("app");
   app.replaceChildren(screens[state.screen](state, actions));
-  window.scrollTo(0, 0);
+  // Jump to the top only when moving to a new screen or step, not on every small change.
+  const view = `${state.screen}/${state.step}/${state.chunkIndex}`;
+  if (view !== lastView) window.scrollTo(0, 0);
+  lastView = view;
 }
 
 function update(changes) {
@@ -62,11 +70,32 @@ const actions = {
   startStudying(text) {
     const chunks = chunkText(text);
     if (!chunks.length) {
-      update({ error: "There's no text to study yet. Paste some notes first." });
+      update({ screen: "home", error: "There's no text to study yet. Paste some notes first." });
       return;
     }
     state = { ...freshState(), chunks };
     loadRound();
+  },
+
+  setStep(step) {
+    update({ step, editingCard: false });
+  },
+
+  openCardEditor() {
+    update({ editingCard: true });
+  },
+
+  closeCardEditor() {
+    update({ editingCard: false });
+  },
+
+  saveOwnCard(card) {
+    const forChunk = [...(state.ownCards[state.chunkIndex] ?? []), card];
+    update({ ownCards: { ...state.ownCards, [state.chunkIndex]: forChunk }, editingCard: false });
+  },
+
+  setCardCount(cardCount) {
+    update({ cardCount });
   },
 };
 

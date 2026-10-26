@@ -29,7 +29,7 @@ Build mode: fast
   Learner check: Upload `sample/sample-notes.pdf` and see key points appear. Then try uploading something that isn't a PDF (an image, say) and confirm you get a clear, calm error message and can try again.
   Commit: `Read uploaded PDFs in the browser`
 
-- [ ] **3. Flip through flashcards, including your own**
+- [x] **3. Flip through flashcards, including your own**
   Becomes usable: From the key points you can **Create your own flashcard** (front and back), then **Go to flashcards**, pick how many you want (1–10), and tap each card to flip it. Your own cards show up after Claude's with a "Yours" tag.
   Why now: Flashcards are the second step of every round. They need the study round from slice 1 but no new call to Claude, so this slice is low risk and makes the round feel real.
   PRD ref: `prd.md > The Core Journey` (steps 5–6), `prd.md > Create Your Own Flashcard`, `prd.md > Flashcards`
@@ -89,3 +89,5 @@ Activity mode: [not started]
 - Background darkened to `#DCE3EC` with off-white `#F4F7FA` cards (accent and borders adjusted to match) — at the slice 1 check the learner found the original light background too bright for long sessions. `spec.md > Look and Feel` updated.
 - Slice 2 was verified by running the same `extractText` + chunker code in Node against the PDF.js legacy build (4 pages → 1,686 words → 3 chunks; a fake PDF is rejected), plus checking that `/vendor/pdfjs/` serves both files as JavaScript — no browser automation was available, so the real upload click is confirmed at the final review.
 - `sample/sample-notes.pdf` (human heart and circulation notes, 4 pages) was generated with a one-off dependency-free script rather than added by hand.
+- The "How many cards?" picker stays above the cards so changing the count updates them instantly, instead of a separate ask-first screen; `state.editingCard` was added to the Data Model to show or hide the own-card editor.
+- From slice 3 on, browser behavior is verified mechanically by loading the real `public/app.js` in jsdom (a simulated browser, kept outside the project) with a faked `/api/study-round`, and clicking through the slice. Visual details such as the flip animation are confirmed by the learner at the final review.
