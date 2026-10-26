@@ -87,13 +87,13 @@ Package versions: use the latest stable at build time. **Check early in the buil
 Implements `prd.md > Look and Feel`. The learner chose dark blues, a light background, and a clean, simple font.
 
 - **Colors**, defined as CSS variables in `public/styles.css`:
-  - background `#F3F6FA` (very light cool grey-blue)
-  - cards and surfaces `#FFFFFF`
+  - background `#DCE3EC` (soft cool grey-blue; darkened after the learner found the first one too bright for long sessions)
+  - cards and surfaces `#F4F7FA` (off-white, not pure white)
   - main text `#13243B` (dark navy)
   - secondary text `#4B5D74`
   - primary buttons and headings `#1F3B63` (dark blue), hover `#162D4D`
-  - soft accent `#E2EAF5`, used for highlighted terms and the selected flashcard count
-  - borders `#D4DDE9`
+  - soft accent `#D6E2F1`, used for highlighted terms and the selected flashcard count
+  - borders `#C5D0DE`
   - feedback, kept muted rather than loud: correct `#2E7558` on `#E3F1EA`, wrong `#A8453D` on `#F6E5E3`
 - **Font:** Inter (Google Fonts), falling back to the system sans-serif. Body text at 17–18px with generous line height (1.6) for easy reading.
 - **Layout:**

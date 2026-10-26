@@ -61,7 +61,7 @@ Build mode: fast
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 1: first real key points from Claude, plus the look and feel
+- [x] Early usable behavior explored — after slice 1: first real key points from Claude, plus the look and feel. Feedback: it works, but the background was too bright for long study sessions; darkened it.
 - [ ] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
@@ -86,3 +86,4 @@ Activity mode: [not started]
 - The helper reads an optional `PORT` (default 3000) — needed to test the missing-key path alongside the running app, and hosts in `6-ship` set `PORT` themselves.
 - Structured outputs cannot enforce exact list lengths (confirmed in the docs); the helper's count checks in `server/studyRound.js` cover it, as the spec anticipated.
 - Current Opus 5.5 pricing confirmed at $4 / $20 per million tokens; a real test chunk took about 14 seconds.
+- Background darkened to `#DCE3EC` with off-white `#F4F7FA` cards (accent and borders adjusted to match) — at the slice 1 check the learner found the original light background too bright for long sessions. `spec.md > Look and Feel` updated.

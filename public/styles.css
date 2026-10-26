@@ -1,13 +1,13 @@
 /* StudyMode: calm, cool, readable. Colors from spec.md > Look and Feel. */
 :root {
-  --bg: #f3f6fa;
-  --surface: #ffffff;
+  --bg: #dce3ec;
+  --surface: #f4f7fa;
   --text: #13243b;
   --text-soft: #4b5d74;
   --primary: #1f3b63;
   --primary-hover: #162d4d;
-  --accent: #e2eaf5;
-  --border: #d4dde9;
+  --accent: #d6e2f1;
+  --border: #c5d0de;
   --correct: #2e7558;
   --correct-bg: #e3f1ea;
   --wrong: #a8453d;
