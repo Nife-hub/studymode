@@ -39,6 +39,7 @@ Success: a long document has been worked through in small, manageable rounds, wi
 - **Mood:** calm and relaxing. Students facing a large amount of content shouldn't feel overwhelmed.
 - **Colors:** a cool background with cool tones, chosen for maximum readability and less eye strain.
 - **Feel:** uncluttered, with one thing at a time on screen, which matches the one-chunk-at-a-time idea.
+- **Palette and type** (decided in `4-spec`): dark blues on a light background, with a clean, simple font.
 - No specific reference apps were given.
 
 ## Features and Behavior

@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudyMode Technical Plan</title>
+<style>
+  :root {
+    --bg: #F3F6FA; --card: #FFFFFF; --ink: #13243B; --muted: #4B5D74;
+    --line: #D4DDE9; --accent: #1F3B63; --accent-hover: #162D4D; --accent-soft: #E2EAF5;
+    --ok: #2E7558; --ok-soft: #E3F1EA; --err: #A8453D; --err-soft: #F6E5E3;
+    --warn: #8A5A14; --warn-soft: #F5EAD8; --on-accent: #FFFFFF;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1723; --card: #172233; --ink: #E4EBF4; --muted: #9DAEC4;
+      --line: #2A3A50; --accent: #8FB3E3; --accent-hover: #A9C5EC; --accent-soft: #1E3049;
+      --ok: #7CC7A6; --ok-soft: #173329; --err: #E8A09A; --err-soft: #3A2224;
+      --warn: #E2B071; --warn-soft: #3A2E1D; --on-accent: #0F1723;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1723; --card: #172233; --ink: #E4EBF4; --muted: #9DAEC4;
+    --line: #2A3A50; --accent: #8FB3E3; --accent-hover: #A9C5EC; --accent-soft: #1E3049;
+    --ok: #7CC7A6; --ok-soft: #173329; --err: #E8A09A; --err-soft: #3A2224;
+    --warn: #E2B071; --warn-soft: #3A2E1D; --on-accent: #0F1723;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 820px; margin: 0 auto; padding: 32px 16px 64px; }
+  .tag { display: inline-block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--warn); background: var(--warn-soft); padding: 2px 10px; border-radius: 99px; }
+  h1 { font-size: 34px; line-height: 1.2; margin: 12px 0 8px; }
+  .lede { color: var(--muted); font-size: 18px; margin: 0 0 24px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; margin-bottom: 16px; }
+  h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+  h3 { margin: 0 0 6px; font-size: 19px; }
+  p { margin: 0 0 10px; }
+  code { font: 13.5px ui-monospace, SFMono-Regular, Consolas, monospace; background: var(--accent-soft); padding: 1px 6px; border-radius: 5px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+
+  /* Architecture diagram */
+  svg { width: 100%; height: auto; display: block; }
+  svg .box { fill: var(--card); stroke: var(--line); stroke-width: 1.5; cursor: pointer; transition: stroke .2s, fill .2s; }
+  svg .box.on { stroke: var(--accent); stroke-width: 3; fill: var(--accent-soft); }
+  svg .group { fill: none; stroke: var(--line); stroke-dasharray: 5 4; }
+  svg text { fill: var(--ink); font: 13px Inter, system-ui, sans-serif; text-anchor: middle; pointer-events: none; }
+  svg .lbl { fill: var(--muted); font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; text-anchor: start; }
+  svg .sub { fill: var(--muted); font-size: 11px; }
+  svg .wire { stroke: var(--muted); stroke-width: 1.6; fill: none; transition: stroke .2s; }
+  svg .wire.on { stroke: var(--accent); stroke-width: 2.6; }
+  svg .head { fill: var(--muted); }
+  .info { background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; font-size: 15px; margin-top: 12px; min-height: 64px; }
+  .info b { color: var(--accent); }
+
+  /* Journey stepper */
+  .stepper { display: flex; align-items: center; gap: 10px; margin: 14px 0 12px; flex-wrap: wrap; }
+  button { background: var(--accent); color: var(--on-accent); border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; cursor: pointer; }
+  button:hover { background: var(--accent-hover); }
+  button:disabled { opacity: .35; cursor: default; }
+  .count { color: var(--muted); font-size: 14px; margin-left: auto; }
+  .dots { display: flex; gap: 6px; flex-wrap: wrap; }
+  .dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--line); cursor: pointer; }
+  .dots span.on { background: var(--accent); }
+  .panel { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .panel .where { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+  /* Look & feel preview */
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; margin-bottom: 16px; }
+  .sw { border: 1px solid #D4DDE9; border-radius: 10px; padding: 34px 8px 6px; font-size: 12px; color: #13243B; background: #fff; position: relative; overflow: hidden; }
+  .sw i { position: absolute; inset: 0 0 auto 0; height: 28px; }
+  .preview { background: #F3F6FA; border-radius: 12px; padding: 18px; color: #13243B; border: 1px solid #D4DDE9; }
+  .preview .bar { font-size: 13px; color: #4B5D74; border-bottom: 2px solid #E2EAF5; padding-bottom: 6px; margin-bottom: 12px; }
+  .preview .bar b { color: #1F3B63; }
+  .preview ul { margin: 0 0 12px; padding-left: 20px; font-size: 17px; line-height: 1.6; }
+  .preview mark { background: #E2EAF5; color: #13243B; font-weight: 600; padding: 0 4px; border-radius: 4px; }
+  .preview .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+  .fc { width: 200px; height: 120px; perspective: 800px; cursor: pointer; }
+  .fc .in { position: relative; width: 100%; height: 100%; transition: transform .4s; transform-style: preserve-3d; }
+  .fc.flip .in { transform: rotateY(180deg); }
+  .fc .face { position: absolute; inset: 0; backface-visibility: hidden; background: #fff; border: 1px solid #D4DDE9;
+    border-radius: 12px; padding: 12px; display: flex; flex-direction: column; justify-content: center; font-size: 15px; }
+  .fc .face small { color: #4B5D74; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+  .fc .back { transform: rotateY(180deg); }
+  .opts { display: grid; gap: 6px; min-width: 220px; flex: 1; }
+  .opt { background: #fff; border: 1px solid #D4DDE9; border-radius: 8px; padding: 7px 10px; font-size: 14px; cursor: pointer; color: #13243B; text-align: left; }
+  .opt:hover { background: #fff; border-color: #1F3B63; }
+  .opt.ok { background: #E3F1EA; border-color: #2E7558; color: #2E7558; }
+  .opt.bad { background: #F6E5E3; border-color: #A8453D; color: #A8453D; }
+  .fb { font-size: 13px; color: #4B5D74; min-height: 20px; }
+
+  /* Components */
+  details { border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; }
+  details[open] { background: var(--bg); }
+  summary { cursor: pointer; font-weight: 600; }
+  summary .prd { font-weight: 400; color: var(--muted); font-size: 13px; margin-left: 6px; }
+  details p { margin: 8px 0 0; font-size: 15px; }
+  .filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .filter button { background: var(--accent-soft); color: var(--ink); font-size: 13px; padding: 4px 10px; }
+  .filter button.on { background: var(--accent); color: var(--on-accent); }
+
+  pre { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px; overflow-x: auto;
+    font: 13px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; margin: 0; }
+  pre .c { color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+  .tablewrap { overflow-x: auto; }
+  ol.run li, ul.list li { margin-bottom: 6px; }
+  .decide { border-left: 4px solid var(--warn); background: var(--warn-soft); border-radius: 8px; padding: 12px 14px; }
+  .who { font-size: 12px; padding: 1px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); margin-left: 4px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<main>
+  <span class="tag">Approved · 4-spec</span>
+  <h1>StudyMode: technical plan</h1>
+  <p class="lede">This is how StudyMode gets built: two small parts on your laptop that turn a long PDF into study rounds, one chunk at a time.</p>
+
+  <section>
+    <h2>How it works, in plain language</h2>
+    <p><b>The page you see</b> is built with plain <b>HTML, CSS and JavaScript</b>, the three languages every browser understands, with no extra toolkit. It reads your PDF with <b>PDF.js</b> and cuts the text into chunks of about 600–800 words.</p>
+    <p><b>A small helper program</b> (a <i>server</i>) hands the page to your browser and holds your secret Claude API key. The page sends it one chunk at a time. The helper asks Claude for key points, flashcards and a quiz, then hands them back. The key never reaches the page.</p>
+    <p class="muted small">Nothing is saved. It all lives in one <code>state</code> object in the page's memory until you close the tab. Click a box below to see what it does.</p>
+
+    <svg viewBox="0 0 760 250" role="img" aria-label="Architecture: the page in the browser talks to the helper server, which talks to Claude">
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <rect class="group" x="8" y="22" width="372" height="214" rx="12"/>
+      <text class="lbl" x="20" y="16">Browser · localhost:3000</text>
+      <rect class="group" x="410" y="22" width="190" height="214" rx="12"/>
+      <text class="lbl" x="420" y="16">Your laptop · port 3000</text>
+      <text class="lbl" x="630" y="16">Anthropic</text>
+
+      <rect class="box" data-node="screens" x="24" y="40" width="340" height="62" rx="10"/>
+      <text x="194" y="66">Screens (HTML/CSS/JS)</text>
+      <text class="sub" x="194" y="85">Opening · Home · Study · Finished</text>
+
+      <rect class="box" data-node="pdf" x="24" y="152" width="160" height="62" rx="10"/>
+      <text x="104" y="178">PDF.js reader</text>
+      <text class="sub" x="104" y="197">file → text</text>
+
+      <rect class="box" data-node="chunker" x="204" y="152" width="160" height="62" rx="10"/>
+      <text x="284" y="178">Chunker</text>
+      <text class="sub" x="284" y="197">text → ~700-word chunks</text>
+
+      <rect class="box" data-node="server" x="426" y="96" width="158" height="74" rx="10"/>
+      <text x="505" y="124">Helper server</text>
+      <text class="sub" x="505" y="143">serves page + API</text>
+      <text class="sub" x="505" y="158">holds the API key</text>
+
+      <rect class="box" data-node="claude" x="626" y="96" width="122" height="74" rx="10"/>
+      <text x="687" y="128">Claude</text>
+      <text class="sub" x="687" y="147">writes the round</text>
+
+      <path class="wire" data-wire="w-pdf" d="M104,102 L104,150" marker-end="url(#ah)"/>
+      <path class="wire" data-wire="w-chunk" d="M184,183 L202,183" marker-end="url(#ah)"/>
+      <path class="wire" data-wire="w-up" d="M284,150 L284,104" marker-end="url(#ah)"/>
+      <path class="wire" data-wire="w-out" d="M364,62 C400,62 400,118 424,118" marker-end="url(#ah)"/>
+      <path class="wire" data-wire="w-back" d="M424,150 C396,150 396,90 366,90" marker-end="url(#ah)"/>
+      <path class="wire" data-wire="w-claude" d="M584,124 L624,124" marker-end="url(#ah)"/>
+      <path class="wire" data-wire="w-claude-back" d="M624,148 L586,148" marker-end="url(#ah)"/>
+    </svg>
+    <div class="info" id="nodeInfo"><span class="muted">Click a box to see what it does and where its code lives.</span></div>
+  </section>
+
+  <section>
+    <h2>The core journey through the system</h2>
+    <p class="muted small">Step through <code>prd.md &gt; The Core Journey</code>. The diagram above lights up to show which part is working at each step.</p>
+    <div class="stepper">
+      <button id="prev">← Back</button>
+      <button id="next">Next →</button>
+      <div class="dots" id="dots"></div>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="panel" id="stepPanel"></div>
+  </section>
+
+  <section>
+    <h2>Look and feel</h2>
+    <p>You chose <b>dark blues on a light background, with a clean, simple font</b> (Inter). Below is a small working preview of the Study Screen in those colors. Tap the card and try a quiz answer.</p>
+    <div class="swatches">
+      <div class="sw"><i style="background:#F3F6FA"></i>Background<br>#F3F6FA</div>
+      <div class="sw"><i style="background:#13243B"></i>Text (navy)<br>#13243B</div>
+      <div class="sw"><i style="background:#1F3B63"></i>Buttons<br>#1F3B63</div>
+      <div class="sw"><i style="background:#E2EAF5"></i>Highlights<br>#E2EAF5</div>
+      <div class="sw"><i style="background:#2E7558"></i>Correct<br>#2E7558</div>
+      <div class="sw"><i style="background:#A8453D"></i>Wrong<br>#A8453D</div>
+    </div>
+    <div class="preview">
+      <div class="bar"><b>Chunk 2 of 7</b> · Summary → Flashcards → Quiz</div>
+      <ul>
+        <li>Plants use <mark>photosynthesis</mark> to turn light into food.</li>
+        <li>It happens in <mark>chloroplasts</mark>, which hold the green pigment <mark>chlorophyll</mark>.</li>
+      </ul>
+      <div class="row">
+        <div class="fc" id="demoCard" role="button" tabindex="0" aria-label="Flashcard, tap to flip">
+          <div class="in">
+            <div class="face"><small>Front</small>What is chlorophyll?</div>
+            <div class="face back"><small>Back</small>The green pigment that absorbs light.</div>
+          </div>
+        </div>
+        <div class="opts" id="demoQuiz">
+          <div style="font-size:15px;font-weight:600">Where does photosynthesis happen?</div>
+          <button class="opt" data-i="0">Mitochondria</button>
+          <button class="opt" data-i="1">Chloroplasts</button>
+          <button class="opt" data-i="2">Nucleus</button>
+          <div class="fb" id="demoFb"></div>
+        </div>
+      </div>
+    </div>
+    <p class="muted small" style="margin-top:12px">Other choices: a single column about 680px wide, 17–18px body text, gentle fades between steps, and short, calm wording.</p>
+  </section>
+
+  <section>
+    <h2>Components</h2>
+    <p class="muted small">Each piece has its own heading in <code>spec.md</code>, so the build can point at it. Filter by where the piece runs:</p>
+    <div class="filter" id="filter">
+      <button class="on" data-f="all">All</button>
+      <button data-f="page">The page</button>
+      <button data-f="helper">Helper server</button>
+    </div>
+    <div id="comps"></div>
+  </section>
+
+  <section>
+    <h2>What the helper sends back for one chunk</h2>
+    <p>Claude is required to reply in exactly this shape (called <i>structured outputs</i>), so the page always knows where the key points, cards and questions are.</p>
+<pre>{
+  "keyPoints": ["Plants use **photosynthesis** to turn light into food.", ...],   <span class="c">// 3–5</span>
+  "flashcards": [{ "front": "What is chlorophyll?", "back": "The green pigment..." }, ...],   <span class="c">// 10</span>
+  "quiz": [{ "question": "...", "options": ["…","…","…","…"],
+             "correctIndex": 1, "explanation": "..." }, ...]   <span class="c">// 5</span>
+}</pre>
+    <p class="small muted" style="margin-top:10px">Claude always makes 10 cards. Your 1–10 pick just chooses how many to show, so changing it is instant and costs nothing extra.</p>
+  </section>
+
+  <section>
+    <h2>Where the data lives</h2>
+    <div class="tablewrap"><table>
+      <tr><th>Data</th><th>What it is</th><th>After closing the tab</th></tr>
+      <tr><td><code>chunks</code></td><td>The chunk texts from your PDF or pasted text</td><td>Gone</td></tr>
+      <tr><td><code>chunkIndex</code></td><td>Which chunk you're on</td><td>Gone</td></tr>
+      <tr><td><code>round</code></td><td>Current chunk's key points, cards and quiz</td><td>Gone</td></tr>
+      <tr><td><code>step</code></td><td>Summary, flashcards, quiz or score</td><td>Gone</td></tr>
+      <tr><td><code>ownCards</code></td><td>Cards you wrote, grouped by chunk</td><td>Gone</td></tr>
+      <tr><td><code>chunkScore</code> / <code>sessionScore</code></td><td>Your quiz score this chunk, and the running total</td><td>Gone</td></tr>
+    </table></div>
+    <p class="small muted" style="margin-top:10px">All of it is held in the <code>state</code> object in <code>app.js</code>. "Gone" is on purpose: saving was cut in <code>scope.md</code>.</p>
+  </section>
+
+  <section>
+    <h2>File structure</h2>
+<pre>studymode/
+├── package.json        <span class="c"># "npm start" runs the helper (auto-restarts on server changes)</span>
+├── .env.example        <span class="c"># ANTHROPIC_API_KEY= (your real .env stays private)</span>
+├── README.md           <span class="c"># setup + how to run + demo steps</span>
+├── sample/sample-notes.pdf   <span class="c"># a PDF known to work, for the demo</span>
+├── server/             <span class="c"># the helper</span>
+│   ├── index.js        <span class="c"># port 3000: serves public/ + PDF.js, POST /api/study-round</span>
+│   └── studyRound.js   <span class="c"># the Claude request + reply shape</span>
+├── public/             <span class="c"># the page you see, sent to the browser as is</span>
+│   ├── index.html · styles.css
+│   ├── app.js          <span class="c"># state object, actions, render()</span>
+│   ├── screens/        <span class="c"># opening, home, study, finished</span>
+│   ├── components/     <span class="c"># loading, summary, ownCardEditor, flashcards, quiz</span>
+│   └── lib/            <span class="c"># dom.js, readPdf.js, chunkText.js, api.js</span>
+└── devpost/            <span class="c"># your planning docs</span></pre>
+  </section>
+
+  <section>
+    <h2>How to run it and record the demo</h2>
+    <ol class="run">
+      <li>Install <b>Node.js</b> (current LTS). In the <b>Claude Console</b> (platform.claude.com), add some prepaid credit, make an API key, and <b>set a monthly spending limit</b>. Claude Pro doesn't cover API use.</li>
+      <li>In the project folder, run <code>npm install</code>.</li>
+      <li>Copy <code>.env.example</code> to <code>.env</code> and paste your key after <code>ANTHROPIC_API_KEY=</code>. Never paste the key into chat.</li>
+      <li>Run <code>npm start</code>, then open <b>http://localhost:3000</b>. After editing page files, just refresh the browser.</li>
+    </ol>
+    <p class="small"><b>Demo video:</b> Get started → upload a 3+ page PDF → summary with highlights → make one card → pick 5 cards and flip a couple → quiz with right and wrong feedback → score → next chunk appears. You'll submit this video plus the public GitHub repo. Hosting is optional and decided in <code>6-ship</code>.</p>
+  </section>
+
+  <section>
+    <h2>Where it could break, and what you'll see</h2>
+    <ul class="list">
+      <li><b>Unusable file</b> (not a PDF, or a scanned PDF): "We couldn't read text from this file. Try another PDF, or paste your text below."</li>
+      <li><b>Claude call fails</b> (missing key, spending limit reached, no internet): "We couldn't prepare this chunk…" with a <b>Try again</b> button. Your score so far is kept.</li>
+      <li><b>Slow reply</b> (10–30 seconds): the loading ring keeps spinning with "This can take a few seconds…".</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>What was kept simple</h2>
+    <ul class="list">
+      <li><b>One Claude request per chunk</b> returns the key points, 10 cards and the quiz together.</li>
+      <li><b>Each chunk is prepared when you reach it</b>, so you only pay for what you study. There's a short wait on each Next chunk.</li>
+      <li><b>One "current screen" value</b> instead of separate web addresses. The browser back button won't move between screens.</li>
+      <li><b>Plain HTML/CSS/JavaScript</b> instead of React: no build step, one command to start. The page is redrawn whole on every change, which is simple and fast enough here.</li>
+      <li><b>The helper also serves the page</b>: one program, one port.</li>
+      <li><b>Nothing saved</b>, and it <b>runs locally</b>.</li>
+    </ul>
+    <p class="small muted">Nothing is faked: every summary, card and question comes from Claude reading your real chunk.</p>
+  </section>
+
+  <section>
+    <h2>Can you switch to React later?</h2>
+    <p>Yes. It's a rewrite of the screen files, not a start-over. The code is split so that most of it carries over:</p>
+    <div class="tablewrap"><table>
+      <tr><th>Part</th><th>If you switch to React</th></tr>
+      <tr><td>Helper server, Claude request</td><td>Unchanged</td></tr>
+      <tr><td><code>readPdf.js</code>, <code>chunkText.js</code>, <code>api.js</code>, <code>styles.css</code></td><td>Unchanged</td></tr>
+      <tr><td><code>state</code> object + actions</td><td>Become React state and event handlers, with the same names</td></tr>
+      <tr><td><code>screens/</code> and <code>components/</code> files</td><td>Each becomes one React component with the same job</td></tr>
+    </table></div>
+    <p class="small muted" style="margin-top:10px">Roughly a few hours of guided work once the app runs. It's best done after you submit.</p>
+  </section>
+
+  <section>
+    <h2>Decisions</h2>
+    <ul class="list">
+      <li>Run locally; decide on hosting later <span class="who">your choice</span></li>
+      <li>Page + small helper server holding the key <span class="who">recommended, you agreed</span></li>
+      <li>Plain HTML/CSS/JavaScript, to ship fast (replaces React) <span class="who">your choice</span></li>
+      <li>Chunks of about 600–800 words, split at paragraph breaks <span class="who">recommended, you agreed</span></li>
+      <li>Key points with highlights, never raw text <span class="who">your request</span></li>
+      <li>Dark blues, light background, clean font <span class="who">your choice</span></li>
+      <li>Express serving the page, state + render pattern, 10 cards per request, <code>**term**</code> highlights, Front/Back own card <span class="who">build details, adjustable</span></li>
+    </ul>
+    <p class="small" style="margin-top:12px"><b>Claude model:</b> Opus 5.5 at low effort, about 5¢ per chunk <span class="who">your choice</span></p>
+  </section>
+</main>
+
+<script>
+(function () {
+  var nodes = {
+    screens: { t: "Screens (HTML/CSS/JS)", d: "What you see and click: the Opening Page, Home Page, Study Screen (summary → flashcards → quiz → score) and Finished Screen. <code>app.js</code> holds all the session data in one <code>state</code> object. Every change goes through a small <i>action</i> that updates <code>state</code> and calls <code>render()</code> to redraw the page.", f: "public/app.js, public/screens/, public/components/" },
+    pdf: { t: "PDF.js reader", d: "Pulls the text out of your PDF right in the browser, so the file never leaves your laptop. If there's almost no text (a scanned PDF), it reports an \"unusable file\" error.", f: "public/lib/readPdf.js" },
+    chunker: { t: "Chunker", d: "Cuts the text into chunks of about 600–800 words at paragraph breaks. Pasted text goes through the same chunker.", f: "public/lib/chunkText.js" },
+    server: { t: "Helper server", d: "A tiny Express program. It sends the page files to your browser, and when asked, it takes a chunk, asks Claude for a study round, checks the reply, and sends it back. It holds your API key from <code>.env</code>, so the key never reaches the page.", f: "server/index.js, server/studyRound.js" },
+    claude: { t: "Claude", d: "Reads one chunk and writes 3–5 key points (important terms marked for highlighting), 10 flashcards, and a 5-question quiz, in the exact shape the page expects.", f: "Called from server/studyRound.js" }
+  };
+  var info = document.getElementById("nodeInfo");
+  function light(on, wires) {
+    document.querySelectorAll("svg .box").forEach(function (b) { b.classList.toggle("on", on.indexOf(b.dataset.node) > -1); });
+    document.querySelectorAll("svg .wire").forEach(function (w) { w.classList.toggle("on", (wires || []).indexOf(w.dataset.wire) > -1); });
+  }
+  document.querySelectorAll("svg .box").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var n = nodes[b.dataset.node];
+      light([b.dataset.node]);
+      info.innerHTML = "<b>" + n.t + "</b>: " + n.d + "<br><span class='muted small'>Code: <code>" + n.f + "</code></span>";
+    });
+  });
+
+  var steps = [
+    { h: "1 · You open StudyMode", b: "Your browser loads the page from the helper at localhost:3000. The app starts on the <b>Opening Page</b>.", prd: "Opening Page", files: "public/app.js, public/screens/opening.js", on: ["screens", "server"] },
+    { h: "2 · You press Get started", b: "<code>state.screen</code> changes and the page redraws as the <b>Home Page</b>: the hero, the how-to steps, then the input area. Nothing has been sent anywhere yet.", prd: "Home Page", files: "public/screens/home.js", on: ["screens"] },
+    { h: "3 · You upload a PDF (or paste text)", b: "PDF.js reads the text in the browser. The chunker cuts it into chunks of about 700 words. If the file has no readable text, you get a friendly error here and can try again or paste text.", prd: "Home Page · Chunking · States and Boundaries", files: "public/lib/readPdf.js, public/lib/chunkText.js", on: ["screens", "pdf", "chunker"], w: ["w-pdf", "w-chunk", "w-up"] },
+    { h: "4 · Loading", b: "The page sends chunk 1 to the helper. The helper asks Claude for key points, 10 cards and 5 quiz questions, all in one reply. The loading ring spins meanwhile.", prd: "Loading", files: "public/lib/api.js, public/components/loading.js, server/studyRound.js", on: ["screens", "server", "claude"], w: ["w-out", "w-claude"] },
+    { h: "5 · Summary", b: "The reply comes back. You see 3–5 key points with important terms highlighted. <b>Create your own flashcard</b> opens a blank Front/Back card. It's kept in memory for this chunk.", prd: "Summary · Create Your Own Flashcard", files: "public/components/summary.js, public/components/ownCardEditor.js", on: ["screens", "server", "claude"], w: ["w-claude-back", "w-back"] },
+    { h: "6 · Flashcards", b: "You pick 1–10. The page shows that many of Claude's 10 cards plus your own (tagged \"Yours\"). Tap to flip. <b>No new request to Claude</b>, so it's instant.", prd: "Flashcards", files: "public/components/flashcards.js", on: ["screens"] },
+    { h: "7 · Quiz", b: "5 questions, one at a time. When you pick an answer, the page checks it against Claude's correct answer and shows Correct or Not quite, plus a one-line explanation.", prd: "Quiz and Score", files: "public/components/quiz.js", on: ["screens"] },
+    { h: "8 · Score, then next chunk", b: "You see the chunk score (for example, 4/5), and the session score grows. <b>Next chunk</b> sends chunk 2 to the helper, and steps 4–8 repeat.", prd: "Quiz and Score · Chunking", files: "public/screens/study.js, public/app.js", on: ["screens", "server", "claude"], w: ["w-out", "w-claude"] },
+    { h: "9 · Finished", b: "After the last chunk's quiz, the <b>Finished Screen</b> shows your total score. <b>Upload another PDF</b> resets <code>state</code> and returns to the Home Page.", prd: "Finished Screen", files: "public/screens/finished.js", on: ["screens"] }
+  ];
+  var i = 0, panel = document.getElementById("stepPanel"), dots = document.getElementById("dots");
+  steps.forEach(function (_, k) { var s = document.createElement("span"); s.title = "Step " + (k + 1); s.onclick = function () { i = k; show(); }; dots.appendChild(s); });
+  function show() {
+    var s = steps[i];
+    panel.innerHTML = "<h3>" + s.h + "</h3><p>" + s.b + "</p><div class='where'>PRD: <code>prd.md &gt; " + s.prd + "</code><br>Files: <code>" + s.files + "</code></div>";
+    document.getElementById("count").textContent = (i + 1) + " / " + steps.length;
+    document.getElementById("prev").disabled = i === 0;
+    document.getElementById("next").disabled = i === steps.length - 1;
+    Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle("on", k === i); });
+    light(s.on, s.w);
+  }
+  document.getElementById("prev").onclick = function () { if (i > 0) { i--; show(); } };
+  document.getElementById("next").onclick = function () { if (i < steps.length - 1) { i++; show(); } };
+  show();
+
+  var card = document.getElementById("demoCard");
+  function flip() { card.classList.toggle("flip"); }
+  card.addEventListener("click", flip);
+  card.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); flip(); } });
+  var answered = false;
+  document.querySelectorAll("#demoQuiz .opt").forEach(function (o) {
+    o.addEventListener("click", function () {
+      if (answered) return; answered = true;
+      var right = document.querySelector("#demoQuiz .opt[data-i='1']");
+      right.classList.add("ok");
+      if (o !== right) o.classList.add("bad");
+      document.getElementById("demoFb").textContent = (o === right ? "Correct. " : "Not quite. ") + "Chloroplasts hold chlorophyll, which captures light.";
+    });
+  });
+
+  var comps = [
+    { n: "Page pattern (state + render)", w: "page", prd: "The Core Journey", d: "One <code>state</code> object holds everything. Actions like <code>goTo</code>, <code>saveOwnCard</code> and <code>nextChunk</code> update it, then <code>render()</code> redraws the current screen. Text is always set as text, never raw HTML.", f: "public/app.js, public/lib/dom.js" },
+    { n: "Opening Page", w: "page", prd: "Opening Page", d: "The name, a one-line description, and a Get started button.", f: "public/screens/opening.js" },
+    { n: "Home Page", w: "page", prd: "Home Page", d: "Hero, how-to steps, PDF upload, a paste-text box with Start studying, and any error message.", f: "public/screens/home.js" },
+    { n: "PDF text reader", w: "page", prd: "Home Page · Non-Goals", d: "PDF.js turns the file into text. Fewer than about 50 words means \"unusable file\".", f: "public/lib/readPdf.js" },
+    { n: "Chunker", w: "page", prd: "Chunking", d: "Chunks of about 600–800 words at paragraph breaks. A tiny leftover joins the chunk before it.", f: "public/lib/chunkText.js" },
+    { n: "Loading", w: "page", prd: "Loading", d: "A calm spinning ring plus \"Reading chunk 2…\".", f: "public/components/loading.js" },
+    { n: "Study round fetcher", w: "page", prd: "Summary · Flashcards · Quiz and Score", d: "Sends a chunk to /api/study-round and returns the round, or a friendly error.", f: "public/lib/api.js" },
+    { n: "Study Screen", w: "page", prd: "Chunking · Screens and Layout", d: "One chunk at a time, stepping summary → flashcards → quiz → score, with a progress line on top.", f: "public/screens/study.js" },
+    { n: "Summary", w: "page", prd: "Summary", d: "3–5 key points. Words wrapped in **double asterisks** are shown highlighted. No timer.", f: "public/components/summary.js" },
+    { n: "Create Your Own Flashcard", w: "page", prd: "Create Your Own Flashcard", d: "A blank Front/Back card with Save and Cancel. Kept for this session only.", f: "public/components/ownCardEditor.js" },
+    { n: "Flashcards", w: "page", prd: "Flashcards", d: "A 1–10 picker (default 5), then the cards, with yours included. Tap to flip.", f: "public/components/flashcards.js" },
+    { n: "Quiz and Score", w: "page", prd: "Quiz and Score", d: "One question at a time, Correct or Not quite plus an explanation, then the chunk score and the session score.", f: "public/components/quiz.js" },
+    { n: "Finished Screen", w: "page", prd: "Finished Screen", d: "The total score and Upload another PDF.", f: "public/screens/finished.js" },
+    { n: "Helper server", w: "helper", prd: "Summary · Flashcards · Quiz and Score", d: "Express on port 3000. It serves the page and PDF.js, and has one route that calls Claude with the reply shape, checks the counts, and returns the round. The key comes from .env.", f: "server/index.js, server/studyRound.js" }
+  ];
+  var box = document.getElementById("comps");
+  function renderComps(f) {
+    box.innerHTML = comps.filter(function (c) { return f === "all" || c.w === f; }).map(function (c) {
+      return "<details><summary>" + c.n + "<span class='prd'>prd.md &gt; " + c.prd + "</span></summary><p>" + c.d + "</p><p class='small muted'>Code: <code>" + c.f + "</code></p></details>";
+    }).join("");
+  }
+  document.querySelectorAll("#filter button").forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll("#filter button").forEach(function (x) { x.classList.toggle("on", x === b); });
+      renderComps(b.dataset.f);
+    };
+  });
+  renderComps("all");
+})();
+</script>
+</body>
+</html>
