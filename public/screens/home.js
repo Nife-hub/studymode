@@ -1,6 +1,13 @@
 // Home Page: the input area where study material comes in.
 import { el } from "../lib/dom.js";
 
+const STEPS = [
+  ["Add your material.", "Upload a PDF or paste your notes below."],
+  ["Read the key points.", "A short summary of one chunk, with the important terms highlighted."],
+  ["Practise with flashcards.", "Choose how many you want, and add your own."],
+  ["Take a quick quiz.", "Five questions, then move on to the next chunk."],
+];
+
 export function homeScreen(state, actions) {
   const fileInput = el("input", {
     type: "file",
@@ -16,8 +23,17 @@ export function homeScreen(state, actions) {
   });
 
   return el("main", { class: "screen" }, [
-    el("h1", {}, "StudyMode"),
-    el("p", { class: "soft" }, "Upload a PDF or paste your notes, then study them one short chunk at a time."),
+    el("section", { class: "hero" }, [
+      el("h1", {}, "Study a little at a time, and actually finish."),
+      el("p", { class: "soft" }, [
+        "Long PDFs are tiring to read straight through. StudyMode splits yours into short chunks. ",
+        "For each one you get the key points, flashcards, and a quick quiz, so you always know what to do next.",
+      ]),
+    ]),
+    el("section", { class: "steps" }, [
+      el("h2", {}, "How it works"),
+      el("ol", {}, STEPS.map(([title, text]) => el("li", {}, [el("strong", {}, title), el("span", { class: "soft" }, text)]))),
+    ]),
     el("section", { class: "card" }, [
       el("h2", {}, "Upload a PDF"),
       fileInput,

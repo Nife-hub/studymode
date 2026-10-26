@@ -416,3 +416,69 @@ textarea.short {
 }
 
 .actions.center { justify-content: center; }
+
+/* Opening Page */
+.opening {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.brand {
+  font-size: 3rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.tagline {
+  font-size: 1.2rem;
+  color: var(--text-soft);
+  margin-bottom: 32px;
+}
+
+.button.large {
+  padding: 14px 34px;
+  font-size: 1.05rem;
+}
+
+/* Home Page hero and steps */
+.hero { margin-bottom: 36px; }
+.hero h1 { font-size: 2rem; }
+
+.steps { margin-bottom: 36px; }
+
+.steps ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+  display: grid;
+  gap: 12px;
+}
+
+.steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  column-gap: 14px;
+  align-items: start;
+}
+
+.steps li::before {
+  content: counter(step);
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.steps li strong { color: var(--primary); }

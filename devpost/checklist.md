@@ -49,7 +49,7 @@ Build mode: fast
   Learner check: Study the sample PDF all the way through: answer the quizzes (get one wrong on purpose), move through the chunks, and reach the Finished Screen. Check that the scores add up and that "Upload another PDF" starts you fresh.
   Commit: `Add quiz, scores, next chunk, and finished screen`
 
-- [ ] **5. Opening Page, Home Page intro, and friendly failures**
+- [x] **5. Opening Page, Home Page intro, and friendly failures**
   Becomes usable: The app now opens on the **Opening Page** (name, description, **Get started**), the Home Page has its hero and how-to steps above the input, a failed Claude call shows a calm message with **Try again** (scores kept), slow replies show "This can take a few seconds…", and a README explains setup.
   Why now: These finish the first impression and protect the demo, but none of them change how the study loop works, so they come after the loop is proven.
   PRD ref: `prd.md > Opening Page`, `prd.md > Home Page` (hero, steps), `prd.md > States and Boundaries`
@@ -92,3 +92,4 @@ Activity mode: [not started]
 - The "How many cards?" picker stays above the cards so changing the count updates them instantly, instead of a separate ask-first screen; `state.editingCard` was added to the Data Model to show or hide the own-card editor.
 - From slice 3 on, browser behavior is verified mechanically by loading the real `public/app.js` in jsdom (a simulated browser, kept outside the project) with a faked `/api/study-round`, and clicking through the slice. Visual details such as the flip animation are confirmed by the learner at the final review.
 - `state.picked` (the option chosen for the current question) was added to the Data Model so answers lock and feedback shows; the button after question 5 reads **See my score**.
+- A failed chunk now stays on the loading screen with **Try again** and a **Back to start** button (not in the spec), so a failure on the very first chunk, such as no API credit, never leaves the learner stuck. The Try again path was verified in jsdom with a faked failure; `api.js` turns a network failure into the same friendly message.

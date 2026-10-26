@@ -2,13 +2,14 @@
 import { chunkText } from "./lib/chunkText.js";
 import { fetchStudyRound } from "./lib/api.js";
 import { readPdf } from "./lib/readPdf.js";
+import { openingScreen } from "./screens/opening.js";
 import { homeScreen } from "./screens/home.js";
 import { studyScreen } from "./screens/study.js";
 import { finishedScreen } from "./screens/finished.js";
 import { loadingView } from "./components/loading.js";
 
 const freshState = () => ({
-  screen: "home",
+  screen: "opening",
   chunks: [],
   chunkIndex: 0,
   round: null,
@@ -26,6 +27,7 @@ const freshState = () => ({
 let state = freshState();
 
 const screens = {
+  opening: openingScreen,
   home: homeScreen,
   loading: loadingView,
   study: studyScreen,
@@ -49,6 +51,7 @@ function update(changes) {
 }
 
 // Fetches the study round for the current chunk, showing the loading ring meanwhile.
+// If it fails, the loading screen offers Try again; chunks and scores are kept.
 async function loadRound() {
   update({ screen: "loading", error: null });
   try {
@@ -62,7 +65,7 @@ async function loadRound() {
       chunkScore: { correct: 0, total: round.quiz.length },
     });
   } catch (err) {
-    update({ screen: "home", error: err.message });
+    update({ error: err.message });
   }
 }
 
@@ -72,7 +75,7 @@ const actions = {
   },
 
   async startFromPdf(file) {
-    update({ screen: "loading", error: null, chunkIndex: 0 });
+    update({ screen: "loading", error: null, chunks: [], chunkIndex: 0 });
     try {
       actions.startStudying(await readPdf(file));
     } catch (err) {
@@ -140,8 +143,12 @@ const actions = {
     loadRound();
   },
 
+  retryChunk() {
+    loadRound();
+  },
+
   startOver() {
-    state = freshState();
+    state = { ...freshState(), screen: "home" };
     render();
   },
 };
