@@ -1,6 +1,7 @@
 // The heart of the page: one `state` object, small actions that change it, and render().
 import { chunkText } from "./lib/chunkText.js";
 import { fetchStudyRound } from "./lib/api.js";
+import { readPdf } from "./lib/readPdf.js";
 import { homeScreen } from "./screens/home.js";
 import { studyScreen } from "./screens/study.js";
 import { loadingView } from "./components/loading.js";
@@ -47,6 +48,15 @@ async function loadRound() {
 const actions = {
   goTo(screen) {
     update({ screen, error: null });
+  },
+
+  async startFromPdf(file) {
+    update({ screen: "loading", error: null, chunkIndex: 0 });
+    try {
+      actions.startStudying(await readPdf(file));
+    } catch (err) {
+      update({ screen: "home", error: err.message });
+    }
   },
 
   startStudying(text) {

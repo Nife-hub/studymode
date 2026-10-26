@@ -19,7 +19,7 @@ Build mode: fast
   Learner check: Start the app with `npm start`, open http://localhost:3000, paste a few paragraphs of your own notes, press **Start studying**. You should see the spinning ring, then a short list of key points with some words highlighted. Say whether the points make sense and whether the look feels calm and readable.
   Commit: `Paste text and show key points for the first chunk`
 
-- [ ] **2. Upload a PDF instead of pasting**
+- [x] **2. Upload a PDF instead of pasting**
   Becomes usable: On the Home Page you can pick a PDF; its text is read in the browser, split into chunks, and chunk 1's key points appear. A scanned PDF or a non-PDF shows the friendly "We couldn't read text from this file…" message and the input stays ready.
   Why now: PDF upload is the main way in, and loading PDF.js without a build tool is the other risk the spec says to check early. Doing it right after slice 1 means bad news arrives while there's still room to adjust.
   PRD ref: `prd.md > Home Page`, `prd.md > States and Boundaries` (unusable file), `prd.md > Non-Goals` (no scanned PDFs)
@@ -87,3 +87,5 @@ Activity mode: [not started]
 - Structured outputs cannot enforce exact list lengths (confirmed in the docs); the helper's count checks in `server/studyRound.js` cover it, as the spec anticipated.
 - Current Opus 5.5 pricing confirmed at $4 / $20 per million tokens; a real test chunk took about 14 seconds.
 - Background darkened to `#DCE3EC` with off-white `#F4F7FA` cards (accent and borders adjusted to match) — at the slice 1 check the learner found the original light background too bright for long sessions. `spec.md > Look and Feel` updated.
+- Slice 2 was verified by running the same `extractText` + chunker code in Node against the PDF.js legacy build (4 pages → 1,686 words → 3 chunks; a fake PDF is rejected), plus checking that `/vendor/pdfjs/` serves both files as JavaScript — no browser automation was available, so the real upload click is confirmed at the final review.
+- `sample/sample-notes.pdf` (human heart and circulation notes, 4 pages) was generated with a one-off dependency-free script rather than added by hand.
