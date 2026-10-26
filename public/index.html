@@ -4,12 +4,26 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>StudyMode</title>
+    <script>
+      // Apply a saved light/dark choice before the page paints, so it doesn't flash.
+      try {
+        const theme = localStorage.getItem("studymode-theme");
+        if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+      } catch {}
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
+    <div class="doodles" aria-hidden="true">
+      <svg class="doodle-book" viewBox="0 0 100 100"><path d="M10 25 Q30 18 50 25 V78 Q30 71 10 78 Z M50 25 Q70 18 90 25 V78 Q70 71 50 78" /></svg>
+      <svg class="doodle-pencil" viewBox="0 0 100 100"><path d="M20 80 L28 62 L72 18 L82 28 L38 72 Z M28 62 L38 72 M64 26 L74 36" /></svg>
+      <svg class="doodle-bulb" viewBox="0 0 100 100"><path d="M50 14 A23 23 0 0 1 65 54 C61 58 59 62 59 67 H41 C41 62 39 58 35 54 A23 23 0 0 1 50 14 Z M42 75 H58 M45 83 H55" /></svg>
+      <svg class="doodle-star" viewBox="0 0 100 100"><path d="M50 12 L60 40 L90 40 L66 58 L75 88 L50 70 L25 88 L34 58 L10 40 L40 40 Z" /></svg>
+    </div>
+    <button class="theme-toggle" id="theme-toggle" type="button"></button>
     <div id="app"></div>
     <script type="module" src="/app.js"></script>
   </body>

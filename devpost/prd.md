@@ -40,6 +40,8 @@ Success: a long document has been worked through in small, manageable rounds, wi
 - **Colors:** a cool background with cool tones, chosen for maximum readability and less eye strain.
 - **Feel:** uncluttered, with one thing at a time on screen, which matches the one-chunk-at-a-time idea.
 - **Palette and type** (decided in `4-spec`): dark blues on a light background, with a clean, simple font.
+- **Friendly and casual** (added at the final review): rounded casual heading font, softer shapes, a catchy short description, and a subtle study-themed background that isn't distracting.
+- **Dark mode** (added at the final review): easy on the eyes for long sessions, and it follows the computer's setting with a manual toggle.
 - No specific reference apps were given.
 
 ## Features and Behavior

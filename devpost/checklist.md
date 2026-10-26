@@ -66,6 +66,12 @@ Build mode: fast
 
 ## Final Review
 
+- [ ] Dark mode — follows the system setting, with a toggle button
+- [ ] Friendlier, more casual look — rounder shapes, softer feel, casual heading font
+- [ ] Catchy, short description for students (Opening tagline and Home headline)
+- [ ] Subtle study-themed background design that isn't distracting
+- [ ] Remove "The file stays on your computer…" line from the upload box
+- [ ] Soft shadow on the upload section
 - [ ] Final review complete — feedback resolved and learner confirms ready to ship
 
 ## Code Tour and App Map
@@ -93,3 +99,4 @@ Activity mode: [not started]
 - From slice 3 on, browser behavior is verified mechanically by loading the real `public/app.js` in jsdom (a simulated browser, kept outside the project) with a faked `/api/study-round`, and clicking through the slice. Visual details such as the flip animation are confirmed by the learner at the final review.
 - `state.picked` (the option chosen for the current question) was added to the Data Model so answers lock and feedback shows; the button after question 5 reads **See my score**.
 - A failed chunk now stays on the loading screen with **Try again** and a **Back to start** button (not in the spec), so a failure on the very first chunk, such as no API credit, never leaves the learner stuck. The Try again path was verified in jsdom with a faked failure; `api.js` turns a network failure into the same friendly message.
+- Final review restyle: dark mode (system setting + toggle, remembered in the browser), Fredoka headings, rounder friendlier shapes, graph-paper background with margin doodles, new catchy copy, stronger shadow on the upload card, and the "file stays on your computer" line removed. The agent chose a soft highlighter-yellow for highlighted terms to fit the study vibe; it can easily go back to blue. `spec.md > Look and Feel` and `prd.md > Look and Feel` updated.

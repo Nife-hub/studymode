@@ -2,10 +2,10 @@
 import { el } from "../lib/dom.js";
 
 const STEPS = [
-  ["Add your material.", "Upload a PDF or paste your notes below."],
-  ["Read the key points.", "A short summary of one chunk, with the important terms highlighted."],
-  ["Practise with flashcards.", "Choose how many you want, and add your own."],
-  ["Take a quick quiz.", "Five questions, then move on to the next chunk."],
+  ["📄", "Drop in your material.", "Upload a PDF or paste your notes below."],
+  ["✨", "Get the key points.", "A short summary of one chunk, with the big ideas highlighted."],
+  ["🃏", "Flip some flashcards.", "Pick how many you want, and add your own."],
+  ["✅", "Take a quick quiz.", "Five questions, then on to the next chunk."],
 ];
 
 export function homeScreen(state, actions) {
@@ -24,22 +24,26 @@ export function homeScreen(state, actions) {
 
   return el("main", { class: "screen" }, [
     el("section", { class: "hero" }, [
-      el("h1", {}, "Study a little at a time, and actually finish."),
-      el("p", { class: "soft" }, [
-        "Long PDFs are tiring to read straight through. StudyMode splits yours into short chunks. ",
-        "For each one you get the key points, flashcards, and a quick quiz, so you always know what to do next.",
-      ]),
+      el("h1", {}, "Turn that never-ending PDF into quick, easy wins."),
+      el("p", { class: "soft" }, "Bite-sized chunks, flashcards and mini quizzes, so you actually make it to the last page."),
     ]),
     el("section", { class: "steps" }, [
       el("h2", {}, "How it works"),
-      el("ol", {}, STEPS.map(([title, text]) => el("li", {}, [el("strong", {}, title), el("span", { class: "soft" }, text)]))),
+      el("ol", {}, STEPS.map(([icon, title, text]) =>
+          el("li", {}, [
+            el("span", { class: "step-icon", "aria-hidden": "true" }, icon),
+            el("strong", {}, title),
+            el("span", { class: "soft" }, text),
+          ])
+        )),
     ]),
-    el("section", { class: "card" }, [
+    el("section", { class: "card upload-card" }, [
       el("h2", {}, "Upload a PDF"),
       fileInput,
       el("label", { class: "upload-box", htmlFor: "pdf-upload" }, [
+        el("span", { class: "upload-emoji", "aria-hidden": "true" }, "📥"),
         el("span", { class: "upload-title" }, "Choose a PDF"),
-        el("span", { class: "soft" }, "The file stays on your computer. Only the chunks you study are sent to Claude, one at a time."),
+        el("span", { class: "soft small" }, "Click here to pick a file"),
       ]),
       state.error && el("p", { class: "error", role: "alert" }, state.error),
       el("p", { class: "divider" }, "or"),

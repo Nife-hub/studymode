@@ -2,6 +2,7 @@
 import { chunkText } from "./lib/chunkText.js";
 import { fetchStudyRound } from "./lib/api.js";
 import { readPdf } from "./lib/readPdf.js";
+import { setUpThemeToggle } from "./lib/theme.js";
 import { openingScreen } from "./screens/opening.js";
 import { homeScreen } from "./screens/home.js";
 import { studyScreen } from "./screens/study.js";
@@ -154,3 +155,4 @@ const actions = {
 };
 
 render();
+setUpThemeToggle();

@@ -84,26 +84,21 @@ Package versions: use the latest stable at build time. **Check early in the buil
 - **Hosting is optional and decided in `6-ship`.** Hosting is free; Claude usage is what costs money, so keep the spending limit. Because the helper is a normal Express app, hosts that run Node apps (for example Render or Railway) can run it as is. Netlify or Vercel would need the single route moved into a serverless function.
 
 ## Look and Feel
-Implements `prd.md > Look and Feel`. The learner chose dark blues, a light background, and a clean, simple font.
+Implements `prd.md > Look and Feel`. The learner chose dark blues and a clean font, then at the final review asked for a friendlier, more casual look, a dark mode, and a subtle study-themed background.
 
-- **Colors**, defined as CSS variables in `public/styles.css`:
-  - background `#DCE3EC` (soft cool grey-blue; darkened after the learner found the first one too bright for long sessions)
-  - cards and surfaces `#F4F7FA` (off-white, not pure white)
-  - main text `#13243B` (dark navy)
-  - secondary text `#4B5D74`
-  - primary buttons and headings `#1F3B63` (dark blue), hover `#162D4D`
-  - soft accent `#D6E2F1`, used for highlighted terms and the selected flashcard count
-  - borders `#C5D0DE`
-  - feedback, kept muted rather than loud: correct `#2E7558` on `#E3F1EA`, wrong `#A8453D` on `#F6E5E3`
-- **Font:** Inter (Google Fonts), falling back to the system sans-serif. Body text at 17–18px with generous line height (1.6) for easy reading.
-- **Layout:**
-  - One centered column, about 680px wide, with lots of white space.
-  - One thing on screen at a time: Summary, Flashcards, and Quiz are separate steps, never stacked.
-  - A thin progress line at the top of the Study Screen ("Chunk 2 of 7 · Quiz").
-- **Highlighted terms:** shown in bold navy on the soft accent background.
-- **Flashcards:** white cards with soft rounded corners and a quiet flip animation of about 0.4s (done in CSS). Front and back are labeled.
-- **Copy tone:** short, calm, and encouraging ("Nice, 4 out of 5. Ready for the next chunk?").
-- **Motion:** minimal. Gentle fades between steps, a slow spinning loading ring, and nothing flashing.
+- **Colors**, defined as CSS variables in `public/styles.css`, with a light and a dark set:
+  - **Light:** background `#DCE3EC` (soft cool grey-blue; darkened after the learner found the first one too bright for long sessions), cards `#F4F7FA`, text `#13243B`, secondary text `#4B5D74`, buttons and headings `#1F3B63`, soft accent `#D6E2F1`, borders `#C5D0DE`.
+  - **Dark:** background `#101826`, cards `#18233A`, text `#E3E9F2`, secondary text `#A3B3C9`, buttons and headings `#9DBCF2` (button text dark), soft accent `#253552`, borders `#2B3A55`.
+  - Highlighted terms look like a soft highlighter pen: `#FBE7A1` in light mode, `#4D4423` with pale yellow text in dark mode.
+  - Feedback is muted rather than loud, with correct (green) and wrong (red) colors in each mode. Every text color pair passes the 4.5:1 contrast standard.
+- **Dark mode:** follows the computer's setting. A round 🌙/☀️ button in the top-right corner switches it by hand, and the browser remembers the choice (`public/lib/theme.js`).
+- **Fonts:** headings in **Fredoka** (rounded and casual), body in **Inter** for easy reading, both from Google Fonts with system fallbacks. Body text is 17px with a 1.6 line height.
+- **Background:** a faint graph-paper grid, like a study notebook, plus four faint line doodles in the side margins (book, pencil, lightbulb, star). The doodles are hidden on narrower screens so they never sit behind the content.
+- **Layout:** one centered column about 680px wide, with lots of white space. One thing on screen at a time: Summary, Flashcards, and Quiz are separate steps. A rounded progress bar sits at the top of the Study Screen ("Chunk 2 of 7 · Quiz").
+- **Friendly details:** rounder cards (20px corners) with soft shadows, pill-shaped buttons, emoji icons on the how-to steps, and a gently bobbing 📚 on the Opening Page. The upload section has a stronger shadow so it stands out as the main thing to do.
+- **Flashcards:** soft rounded cards with a quiet flip animation of about 0.4s (done in CSS). Front and back are labeled.
+- **Copy tone:** short, casual, and encouraging. The Opening tagline is "Big reading, bite-sized wins."; the Home headline is "Turn that never-ending PDF into quick, easy wins."
+- **Motion:** minimal, with gentle fades and a slow spinning loading ring. All animation is switched off when the computer's "reduce motion" setting is on.
 
 ## Components
 
