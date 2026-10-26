@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study Assistant Scope</title>
+<style>
+  :root {
+    --bg: #f7f5f0; --card: #ffffff; --ink: #1f2328; --muted: #5f6670;
+    --line: #e2ddd3; --accent: #2f6f5e; --accent-soft: #e3efe9;
+    --warn: #9a5b13; --warn-soft: #f6ead9; --cut: #8a3b3b; --cut-soft: #f3e1e1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16181b; --card: #1f2226; --ink: #e8e6e1; --muted: #a2a7ae;
+      --line: #33373d; --accent: #7cc3ac; --accent-soft: #1f3a32;
+      --warn: #e2b071; --warn-soft: #3a2e1d; --cut: #e39a9a; --cut-soft: #3b2324;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  .tag { display: inline-block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--warn); background: var(--warn-soft); padding: 2px 10px; border-radius: 99px; }
+  h1 { font-size: 32px; line-height: 1.2; margin: 12px 0 8px; }
+  .lede { color: var(--muted); font-size: 18px; margin: 0 0 28px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px 22px; margin-bottom: 16px; }
+  h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+  .kernel { border-left: 4px solid var(--accent); }
+  .kernel p { font-size: 18px; margin: 0; }
+  blockquote { margin: 0; padding-left: 14px; border-left: 3px solid var(--line); color: var(--muted); font-style: italic; }
+  svg { width: 100%; height: auto; display: block; }
+  svg .box { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+  svg .start { fill: var(--card); stroke: var(--line); stroke-width: 1.5; }
+  svg text { fill: var(--ink); font: 14px system-ui, sans-serif; text-anchor: middle; }
+  svg .small { fill: var(--muted); font-size: 12px; }
+  svg .arrow { stroke: var(--accent); stroke-width: 2; fill: none; }
+  svg .loop { stroke: var(--accent); stroke-width: 2; fill: none; stroke-dasharray: 5 4; }
+  svg .head { fill: var(--accent); }
+  ol { padding-left: 20px; margin: 8px 0 0; }
+  details { border: 1px solid var(--line); border-radius: 10px; margin-top: 10px; overflow: hidden; }
+  summary { cursor: pointer; padding: 12px 16px; font-weight: 600; list-style: none; display: flex; gap: 10px; align-items: center; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; margin-left: auto; color: var(--muted); font-size: 20px; }
+  details[open] summary::after { content: "–"; }
+  details ul { margin: 0; padding: 0 16px 14px 36px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .now .dot { background: var(--accent); } .later .dot { background: var(--warn); } .cut .dot { background: var(--cut); }
+  .steps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .steps span { background: var(--accent-soft); color: var(--ink); padding: 4px 10px; border-radius: 8px; font-size: 14px; }
+  .steps .wow { background: var(--accent); color: var(--card); }
+  footer { color: var(--muted); font-size: 13px; text-align: center; margin-top: 24px; }
+</style>
+</head>
+<body>
+<main>
+  <span class="tag">Scope · approved</span>
+  <h1>Study Assistant <span style="color:var(--muted);font-weight:400;font-size:20px">(working name)</span></h1>
+  <p class="lede">Upload a PDF and study it one short chunk at a time: a quick summary, flashcards, then a quiz before moving on.</p>
+
+  <section class="kernel">
+    <h2>The unique kernel</h2>
+    <p>Your document becomes a series of <strong>small study rounds</strong> instead of one long wall of text. Most tools summarize everything at once. This one is built to keep you from losing focus.</p>
+  </section>
+
+  <section>
+    <h2>The core loop</h2>
+    <svg viewBox="0 0 700 230" role="img" aria-label="Upload a PDF, then for each chunk: summary, flashcards, quiz with score, then next chunk loops back to summary.">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" class="head"/>
+        </marker>
+      </defs>
+      <rect class="start" x="10" y="60" width="110" height="60" rx="12"/>
+      <text x="65" y="95">Upload PDF</text>
+      <path class="arrow" d="M120 90 H160" marker-end="url(#ah)"/>
+      <rect class="box" x="165" y="60" width="140" height="60" rx="12"/>
+      <text x="235" y="88">Short summary</text><text class="small" x="235" y="106">chunk 1, 2, 3…</text>
+      <path class="arrow" d="M305 90 H345" marker-end="url(#ah)"/>
+      <rect class="box" x="350" y="60" width="140" height="60" rx="12"/>
+      <text x="420" y="95">Flashcards</text>
+      <path class="arrow" d="M490 90 H530" marker-end="url(#ah)"/>
+      <rect class="box" x="535" y="60" width="150" height="60" rx="12"/>
+      <text x="610" y="88">Quiz</text><text class="small" x="610" y="106">see your score</text>
+      <path class="loop" d="M610 120 V185 H235 V125" marker-end="url(#ah)"/>
+      <text x="422" y="208">press “next” → next chunk</text>
+      <text class="small" x="350" y="30">one chunk at a time keeps you focused</text>
+    </svg>
+  </section>
+
+  <section>
+    <h2>Who it's for</h2>
+    <p>First, <strong>you</strong>. Later, anyone studying from long books or PDFs. Today you read the PDF straight through, and then:</p>
+    <blockquote>“It's too long and boring so I lose focus… I get tired of it after a few pages so I end up dropping it.”</blockquote>
+  </section>
+
+  <section>
+    <h2>What “working” looks like · the one-minute demo</h2>
+    <div class="steps">
+      <span>Upload a PDF</span><span>Short summary</span><span>Flashcards</span><span>Quiz + score</span><span class="wow">Next → chunk 2 appears</span>
+    </div>
+    <p style="margin-bottom:0">The “oh, that's cool” moment: a long, boring PDF turns into bite-sized rounds you actually want to finish.</p>
+  </section>
+
+  <section>
+    <h2>What's in, what waits, what's out</h2>
+    <details class="now" open>
+      <summary><span class="dot"></span>Now: the proof of concept</summary>
+      <ul>
+        <li>PDF upload</li>
+        <li>Splitting the document into chunks</li>
+        <li>For each chunk: short summary, flashcards, quiz</li>
+        <li>A score for each quiz, plus a running score for this study session</li>
+        <li>Moving to the next chunk</li>
+      </ul>
+    </details>
+    <details class="later">
+      <summary><span class="dot"></span>Later: worth doing, not yet</summary>
+      <ul>
+        <li>Tracking scores over time (needs saving)</li>
+        <li>User accounts and saving progress</li>
+        <li>Opening it up for other people to use</li>
+        <li>Other file types (Word docs, web articles)</li>
+      </ul>
+    </details>
+    <details class="cut">
+      <summary><span class="dot"></span>Cut, and why</summary>
+      <ul>
+        <li><strong>Content idea generator.</strong> The other candidate idea. We chose the study assistant because you live this problem and can judge whether the fix works.</li>
+        <li><strong>Accounts and saving for this version.</strong> Not needed to prove the chunk-by-chunk loop, and they'd eat into the 2–4 hour budget.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section>
+    <h2>Look and feel</h2>
+    <p style="margin:0;color:var(--muted)">Not discussed yet. We'll cover it in the next step (<code>3-prd</code>), since working with design is one of your learning goals.</p>
+  </section>
+
+  <footer>Companion to <code>devpost/scope.md</code>. The Markdown file is the source of truth.</footer>
+</main>
+</body>
+</html>

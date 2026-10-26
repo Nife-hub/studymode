@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudyMode Product Plan</title>
+<style>
+  :root {
+    --bg: #eef3f6; --card: #ffffff; --ink: #1d2a33; --muted: #5a6b77;
+    --line: #d6e1e8; --accent: #3b7a99; --accent-soft: #e1eef5;
+    --ok: #2f7a5c; --ok-soft: #e1f1ea; --warn: #9a5b13; --warn-soft: #f6ead9;
+    --err: #9b3d3d; --err-soft: #f6e3e3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141a1f; --card: #1c242b; --ink: #e3eaef; --muted: #9aabb7;
+      --line: #2e3a44; --accent: #7fb8d4; --accent-soft: #1f3341;
+      --ok: #7cc7a6; --ok-soft: #1c3a2f; --warn: #e2b071; --warn-soft: #3a2e1d;
+      --err: #e39a9a; --err-soft: #3b2324;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 780px; margin: 0 auto; padding: 32px 16px 64px; }
+  .tag { display: inline-block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--warn); background: var(--warn-soft); padding: 2px 10px; border-radius: 99px; }
+  h1 { font-size: 34px; line-height: 1.2; margin: 12px 0 8px; }
+  .lede { color: var(--muted); font-size: 18px; margin: 0 0 24px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; margin-bottom: 16px; }
+  h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+  h3 { margin: 0 0 6px; font-size: 20px; }
+  .expand { background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; font-size: 15px; }
+  .expand b { color: var(--accent); }
+  svg { width: 100%; height: auto; display: block; }
+  svg .node { fill: var(--card); stroke: var(--line); stroke-width: 1.5; cursor: pointer; }
+  svg .node.study { fill: var(--accent-soft); stroke: var(--accent); }
+  svg .node.active { stroke: var(--accent); stroke-width: 3; }
+  svg text { fill: var(--ink); font: 13px system-ui, sans-serif; text-anchor: middle; pointer-events: none; }
+  svg .small { fill: var(--muted); font-size: 11px; }
+  svg .arrow { stroke: var(--muted); stroke-width: 1.6; fill: none; }
+  svg .loop { stroke: var(--accent); stroke-width: 2; fill: none; stroke-dasharray: 5 4; }
+  svg .head { fill: var(--muted); } svg .headA { fill: var(--accent); }
+  .stepper { display: flex; align-items: center; gap: 10px; margin: 14px 0 12px; }
+  .stepper button { background: var(--accent); color: var(--card); border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; cursor: pointer; }
+  .stepper button:disabled { opacity: .35; cursor: default; }
+  .stepper .count { color: var(--muted); font-size: 14px; margin-left: auto; }
+  .panel { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .panel ul { margin: 6px 0 0; padding-left: 20px; }
+  .crit li { list-style: none; margin-left: -20px; }
+  .crit li::before { content: "☐ "; color: var(--ok); }
+  .state { margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-size: 14px; }
+  .state.err { background: var(--err-soft); }
+  .state.info { background: var(--accent-soft); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+  .swatch { border-radius: 10px; padding: 14px; border: 1px solid var(--line); }
+  details { border: 1px solid var(--line); border-radius: 10px; margin-top: 10px; }
+  summary { cursor: pointer; padding: 12px 16px; font-weight: 600; list-style: none; display: flex; gap: 10px; align-items: center; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; margin-left: auto; color: var(--muted); font-size: 20px; }
+  details[open] summary::after { content: "–"; }
+  details ul { margin: 0; padding: 0 16px 14px 36px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .d-now { background: var(--ok); } .d-later { background: var(--warn); } .d-no { background: var(--err); } .d-q { background: var(--accent); }
+  footer { color: var(--muted); font-size: 13px; text-align: center; margin-top: 24px; }
+</style>
+</head>
+<body>
+<main>
+  <span class="tag">PRD · approved</span>
+  <h1>StudyMode</h1>
+  <p class="lede">Turns a long PDF or pasted notes into short study rounds, one chunk at a time: summary, then flashcards, then a quiz.</p>
+
+  <section>
+    <h2>From scope to product</h2>
+    <div class="expand">Scope said <b>“summary → flashcards → quiz, one chunk at a time.”</b> Now we know exactly what that means: an opening page, a home page with steps and two ways in, a loading state, tap-to-flip cards, 5 multiple-choice questions per chunk with instant correct/wrong, flashcards you choose the number of (max 10) plus your own cards, a running score, and a finish line with your total.</div>
+  </section>
+
+  <section>
+    <h2>The core journey · click a step or use the buttons</h2>
+    <svg viewBox="0 0 720 260" role="img" aria-label="Opening page, home page, loading, then summary, flashcards and quiz repeating per chunk, ending at the finished screen.">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="head"/></marker>
+        <marker id="ahA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="headA"/></marker>
+      </defs>
+      <g data-i="0"><rect class="node" x="10" y="20" width="150" height="50" rx="10"/><text x="85" y="50">Opening Page</text></g>
+      <path class="arrow" d="M160 45 H200" marker-end="url(#ah)"/>
+      <g data-i="1"><rect class="node" x="205" y="20" width="150" height="50" rx="10"/><text x="280" y="44">Home Page</text><text class="small" x="280" y="60">upload or paste</text></g>
+      <path class="arrow" d="M355 45 H395" marker-end="url(#ah)"/>
+      <g data-i="2"><rect class="node" x="400" y="20" width="130" height="50" rx="10"/><text x="465" y="50">Loading</text></g>
+      <path class="arrow" d="M465 70 V100 H85 V125" marker-end="url(#ah)"/>
+      <g data-i="3"><rect class="node study" x="10" y="130" width="150" height="50" rx="10"/><text x="85" y="160">Summary</text></g>
+      <path class="arrow" d="M160 155 H200" marker-end="url(#ah)"/>
+      <g data-i="4"><rect class="node study" x="205" y="130" width="150" height="50" rx="10"/><text x="280" y="152">Flashcards</text><text class="small" x="280" y="168">choose up to 10 · tap to flip</text></g>
+      <path class="arrow" d="M355 155 H395" marker-end="url(#ah)"/>
+      <g data-i="5"><rect class="node study" x="400" y="130" width="130" height="50" rx="10"/><text x="465" y="152">Quiz</text><text class="small" x="465" y="168">5 questions + score</text></g>
+      <path class="loop" d="M465 180 V225 H85 V185" marker-end="url(#ahA)"/>
+      <text class="small" x="275" y="245">next chunk</text>
+      <path class="arrow" d="M530 155 H565" marker-end="url(#ah)"/>
+      <g data-i="6"><rect class="node" x="570" y="130" width="140" height="50" rx="10"/><text x="640" y="152">Finished</text><text class="small" x="640" y="168">after last chunk</text></g>
+    </svg>
+
+    <div class="stepper">
+      <button id="prev">← Back</button><button id="next">Next →</button><span class="count" id="count"></span>
+    </div>
+    <div class="panel" id="panel"></div>
+  </section>
+
+  <section>
+    <h2>Look and feel</h2>
+    <div class="grid">
+      <div class="swatch" style="background:var(--accent-soft)"><b>Calm & relaxing</b><br><span style="color:var(--muted);font-size:14px">Big documents shouldn't feel overwhelming.</span></div>
+      <div class="swatch"><b>Cool background & tones</b><br><span style="color:var(--muted);font-size:14px">Maximum readability, less eye strain.</span></div>
+      <div class="swatch"><b>One thing at a time</b><br><span style="color:var(--muted);font-size:14px">Uncluttered, like the chunk-by-chunk idea.</span></div>
+    </div>
+    <p style="margin:12px 0 0;color:var(--muted);font-size:14px">This page uses calm, cool colors as a hint of the feel. The real styling gets decided in <code>4-spec</code>.</p>
+  </section>
+
+  <section>
+    <h2>Boundaries</h2>
+    <details open><summary><span class="dot d-now"></span>What we're building</summary>
+      <ul><li>Opening Page → Home Page (hero, steps, PDF upload, paste text)</li><li>Loading icon while content is prepared</li><li>Per chunk: summary (no timer, create your own card) → your chosen number of flashcards, max 10, tap to flip → 5-question quiz with correct/wrong and a chunk score</li><li>Running session score, then a Finished Screen with the total and “upload another PDF”</li><li>Friendly error for unusable files</li></ul></details>
+    <details><summary><span class="dot d-later"></span>Deferred, and later ideas</summary>
+      <ul><li>Score history over time (needs saving)</li><li>Accounts and saved progress</li><li>Other file types (Word, web articles)</li><li>Opening it up publicly; resuming where you left off</li></ul></details>
+    <details><summary><span class="dot d-no"></span>Non-goals</summary>
+      <ul><li>Not a whole-document summarizer. It always works one chunk at a time.</li><li>Not the content idea generator (cut in scope).</li><li>No reading text out of scanned images. It shows an error and suggests pasting text.</li></ul></details>
+    <details><summary><span class="dot d-q"></span>Open questions (assumptions)</summary>
+      <ul><li>Chunk size: “short,” with no reading timer. The exact amount of text is decided in <code>4-spec</code>.</li><li>Own-card template: assumed front (question or keyword) and back (your note).</li></ul></details>
+  </section>
+
+  <footer>Companion to <code>devpost/prd.md</code>. The Markdown file is the source of truth.</footer>
+</main>
+<script>
+  const steps = [
+    { t: "Opening Page", d: "First thing you see.", c: ["Shows the name “StudyMode” and a short description", "A “Get started” button leads to the Home Page"] },
+    { t: "Home Page", d: "Hero section, then the how-to steps, then the input area.", c: ["Hero introduces StudyMode", "Shows the steps for using the app", "Below the steps: upload a PDF", "Below the steps: paste text instead"],
+      s: [["err", "<b>Error:</b> not a PDF, or a scanned PDF with no readable text → an error message explains it, and you can upload another file or paste text."]] },
+    { t: "Loading", d: "Claude reads the material and prepares the first chunk.", c: ["A loading icon is visible while processing", "It goes away when content is ready"] },
+    { t: "Summary", d: "Each chunk opens with a short summary of only that chunk.", c: ["Material is split into multiple chunks; only one is studied at a time", "A short summary of the current chunk", "No time limit: read at your own pace", "A button opens a blank card; type your own note and save it", "You can move on to the flashcards"],
+      s: [["info", "<b>Why own cards:</b> writing in your own words sticks better in memory. Lasts for this session only."]] },
+    { t: "Flashcards", d: "Flashcards for the current chunk.", c: ["Choose how many cards you want for this chunk (max 10)", "Cards are based on this chunk", "Your own cards show up alongside the generated ones", "Tapping a card flips it", "You can move on to the quiz"] },
+    { t: "Quiz", d: "5 multiple-choice questions about this chunk.", c: ["After each answer: correct or wrong is shown", "After question 5: your chunk score (e.g. 4/5)", "A running session score carries across chunks", "Next → the next chunk's summary"] },
+    { t: "Finished Screen", d: "After the last chunk's quiz.", c: ["Total score for the whole document", "Option to upload another PDF"], s: [["info", "<b>Nothing is saved:</b> closing the app ends the session."]] }
+  ];
+  let i = 0;
+  const panel = document.getElementById("panel"), nodes = document.querySelectorAll("svg g[data-i]");
+  function render() {
+    const s = steps[i];
+    panel.innerHTML = `<h3>${s.t}</h3><p style="margin:0 0 6px;color:var(--muted)">${s.d}</p>
+      <ul class="crit">${s.c.map(x => `<li>${x}</li>`).join("")}</ul>` +
+      (s.s || []).map(([k, v]) => `<div class="state ${k}">${v}</div>`).join("");
+    nodes.forEach(n => n.querySelector("rect").classList.toggle("active", +n.dataset.i === i));
+    document.getElementById("count").textContent = `Step ${i + 1} of ${steps.length}`;
+    document.getElementById("prev").disabled = i === 0;
+    document.getElementById("next").disabled = i === steps.length - 1;
+  }
+  document.getElementById("prev").onclick = () => { i--; render(); };
+  document.getElementById("next").onclick = () => { i++; render(); };
+  nodes.forEach(n => n.addEventListener("click", () => { i = +n.dataset.i; render(); }));
+  render();
+</script>
+</body>
+</html>
