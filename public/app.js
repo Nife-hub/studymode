@@ -3,12 +3,23 @@ import { chunkText } from "./lib/chunkText.js";
 import { fetchStudyRound } from "./lib/api.js";
 import { readPdf } from "./lib/readPdf.js";
 import { setUpThemeToggle } from "./lib/theme.js";
-import { saveSession, nameFromText } from "./lib/history.js";
+import { saveSession, deleteSession, nameFromText } from "./lib/history.js";
 import { openingScreen } from "./screens/opening.js";
 import { homeScreen } from "./screens/home.js";
 import { studyScreen } from "./screens/study.js";
 import { finishedScreen } from "./screens/finished.js";
+import { historyScreen, SORTS } from "./screens/history.js";
 import { loadingView } from "./components/loading.js";
+
+const SORT_KEY = "studymode-history-sort";
+
+function savedSort() {
+  try {
+    const sort = localStorage.getItem(SORT_KEY);
+    if (sort in SORTS) return sort;
+  } catch {}
+  return "newest";
+}
 
 const freshState = () => ({
   screen: "opening",
@@ -26,6 +37,7 @@ const freshState = () => ({
   sessionId: null,
   name: "",
   results: [], // per chunk: [{ question, right }]
+  historySort: savedSort(),
   error: null,
 });
 
@@ -37,6 +49,7 @@ const screens = {
   loading: loadingView,
   study: studyScreen,
   finished: finishedScreen,
+  history: historyScreen,
 };
 
 let lastView = "";
@@ -175,6 +188,29 @@ const actions = {
 
   retryChunk() {
     loadRound();
+  },
+
+  setHistorySort(historySort) {
+    try {
+      localStorage.setItem(SORT_KEY, historySort);
+    } catch {}
+    update({ historySort });
+  },
+
+  deleteSession(id, name) {
+    if (!confirm(`Delete "${name}" from your history? This can't be undone.`)) return;
+    deleteSession(id);
+    render();
+  },
+
+  // Stopping mid-document: chunks with a finished quiz are already in history.
+  leaveStudy() {
+    const midChunk = state.step !== "score";
+    const message = midChunk
+      ? "Go back to the Home Page? Your progress in this chunk won't be kept, but finished chunks are saved in your history."
+      : "Go back to the Home Page? Your finished chunks are saved in your history.";
+    if (!confirm(message)) return;
+    actions.startOver();
   },
 
   startOver() {

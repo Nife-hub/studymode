@@ -60,15 +60,15 @@ Saved data lives in the browser's **localStorage**, with no accounts and no serv
 ## Build Steps
 Each step leaves the app working and gets its own commit.
 
-- [ ] **1. Save each session to history**
+- [x] **1. Save each session to history**
   Becomes usable: Every finished chunk is saved in the browser. Nothing new is shown yet, but the saved data can be seen in the browser's developer tools (Application > Local Storage).
   Build: Write `public/lib/history.js` to load, save, and delete sessions in localStorage, wrapped in try/catch like `theme.js`. Add an optional **name box** to the paste area in `home.js`. Add `sessionId`, `name`, and `results` (per chunk: each question and whether it was right) to `state`. Record each answer in `answerQuestion`, and save the session when a chunk's quiz ends and when the document is finished.
   Verify: Study two chunks of `sample/sample-notes.pdf` and check that one entry appears with the file name, date, score, and "2 of N chunks", marked unfinished. Finish the document and check it becomes finished. Paste text with no name and check that the name is the first few words.
   Commit: `Save study sessions to browser history`
 
-- [ ] **2. History screen with delete**
-  Becomes usable: A **History** button on the Home Page and the Finished Screen opens a list of past sessions (name, date, total score, or "Unfinished · 2 of 5 chunks"), each with **Delete**. Unfinished entries show **Continue** and **Start over** buttons, which come alive in Step 4. A **Sort by** menu above the list orders it by Newest first, Oldest first, Highest score, Lowest score, or Name (A–Z). An empty history shows a friendly line.
-  Build: Write `public/screens/history.js`, register it in `app.js`, add the buttons, a `deleteSession` action, and a `setHistorySort` action that remembers the choice in localStorage (wrapped in try/catch like `theme.js`). Add list styles.
+- [x] **2. History screen with delete, and a Home button while studying**
+  Becomes usable: A **History** button on the Home Page and the Finished Screen opens a list of past sessions (name, date, total score, or "Unfinished · 2 of 5 chunks"), each with **Delete** (asks first). A **Sort by** menu above the list orders it by Newest first, Oldest first, Highest score, Lowest score, or Name (A–Z). An empty history shows a friendly line. The Study Screen gets a **← Home** button so the learner can stop in the middle; it asks first, and finished chunks stay in history. *Learner's request, found while testing Step 1.*
+  Build: Write `public/screens/history.js`, register it in `app.js`, add the buttons, a `deleteSession` action, a `leaveStudy` action for the Home button, and a `setHistorySort` action that remembers the choice in localStorage (wrapped in try/catch like `theme.js`). Add list styles.
   Verify: The list matches what's in localStorage. Each sort option puts the entries in the expected order, and the chosen sort is still selected after a reload. Delete removes only that entry, and the deletion is still there after a reload.
   Commit: `Add history screen`
 
@@ -79,7 +79,7 @@ Each step leaves the app working and gets its own commit.
   Commit: `Show each session's questions in history`
 
 - [ ] **4. Resume from history**
-  Becomes usable: **Continue** on an unfinished entry opens the start of its next unfinished chunk with the score so far. **Start over** begins the same document from chunk 1 as a new session.
+  Becomes usable: Unfinished entries in History get **Continue** and **Start over** buttons. **Continue** opens the start of its next unfinished chunk with the score so far. **Start over** begins the same document from chunk 1 as a new session.
   Build: Save the chunks' text with every unfinished session in a separate localStorage key per session (so the history list loads fast), and remove it when the session is finished. Add `resumeSession` and `restartSession` actions, and wire up the buttons in `history.js`. An entry without saved text shows "Document not saved" instead of the buttons.
   Verify: Stop document A after chunk 2 and document B after chunk 1. Reload, open History, and Continue A: chunk 3 loads with A's score kept. Continue B: chunk 2 loads. Start over on A: chunk 1 loads, and the old A entry stays unfinished without saved text. Finish a session and check its saved text is gone.
   Commit: `Resume unfinished sessions from history`

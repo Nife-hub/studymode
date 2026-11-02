@@ -33,6 +33,7 @@ export function homeScreen(state, actions) {
     el("section", { class: "hero" }, [
       el("h1", {}, "Turn that never-ending PDF into quick, easy wins."),
       el("p", { class: "soft" }, "Bite-sized chunks, flashcards and mini quizzes, so you actually make it to the last page."),
+      el("button", { class: "button secondary", onClick: () => actions.goTo("history") }, "📊 Your history"),
     ]),
     el("section", { class: "steps" }, [
       el("h2", {}, "How it works"),

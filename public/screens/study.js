@@ -1,4 +1,4 @@
-// Study Screen: one chunk at a time, with a progress line on top.
+// Study Screen: one chunk at a time, with a Home button and a progress line on top.
 import { el } from "../lib/dom.js";
 import { summaryView } from "../components/summary.js";
 import { flashcardsView } from "../components/flashcards.js";
@@ -12,6 +12,7 @@ export function studyScreen(state, actions) {
   const steps = { summary: summaryView, flashcards: flashcardsView, quiz: quizView, score: scoreView };
 
   return el("main", { class: "screen" }, [
+    el("button", { class: "button secondary back-button", onClick: actions.leaveStudy }, "← Home"),
     el("p", { class: "progress" }, `Chunk ${chunkNumber} of ${total} · ${STEP_LABELS[state.step]}`),
     el("div", { class: "progress-bar" }, el("div", { style: `width: ${(chunkNumber / total) * 100}%` })),
     steps[state.step](state, actions),
