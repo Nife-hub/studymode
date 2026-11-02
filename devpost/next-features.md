@@ -23,7 +23,7 @@ Saved data lives in the browser's **localStorage**, with no accounts and no serv
 - Session name (see Naming).
 - Date.
 - Total score.
-- For each chunk: every quiz question, and whether the learner got it right or wrong.
+- For each chunk: every quiz question with its options, the right answer, the explanation, what the learner picked, and whether it was right.
 - Finished or unfinished, and how many chunks are done.
 
 ### History list
@@ -73,7 +73,7 @@ Each step leaves the app working and gets its own commit.
   Commit: `Add history screen`
 
 - [ ] **3. Session detail**
-  Becomes usable: Opening an entry shows every question grouped under its chunk, each marked right or wrong, with a **Back to history** button.
+  Becomes usable: Clicking an entry's name opens a list of its chunks, each with its score. Clicking a chunk opens it to show its questions, each marked right or wrong, so long documents (100+ chunks) aren't overwhelming. Clicking a question opens it so the learner can answer it again for revision: the right answer and explanation show after picking, with the first answer noted and a **Try again** button. Practice isn't scored or saved. *Learner's requests.* A **Back to history** button returns to the list.
   Build: Add the detail view to `history.js` (a `viewingSession` value in `state`), reusing the quiz's right/wrong colors.
   Verify: A session with one wrong answer on purpose shows exactly that question as wrong, under the right chunk.
   Commit: `Show each session's questions in history`
@@ -91,4 +91,7 @@ Each step leaves the app working and gets its own commit.
   Commit: `Show storage use and handle full storage`
 
 ## Where We Left Off
-Everything is decided and the build steps are planned. Next: commit this plan, then start Build Step 1 (save each session to history).
+Paused on 2026-11-02 ("ill continue later").
+- Steps 1 and 2 are done and checked by the learner.
+- Step 3 is built and committed: chunks open one at a time, and questions can be answered again for revision. **Still to do:** the learner's check of Step 3 (open a chunk, practise a wrong question, try it in dark mode). Sessions saved before this change only have the question text, so their questions can't be practised.
+- Next: after that check, mark Step 3 done and start Step 4 (Continue and Start over from History).

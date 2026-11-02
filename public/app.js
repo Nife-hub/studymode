@@ -36,8 +36,9 @@ const freshState = () => ({
   sessionScore: { correct: 0, total: 0 },
   sessionId: null,
   name: "",
-  results: [], // per chunk: [{ question, right }]
+  results: [], // per chunk: [{ question, options, correctIndex, explanation, picked, right }]
   historySort: savedSort(),
+  viewingSession: null, // id of the session open in History
   error: null,
 });
 
@@ -104,7 +105,7 @@ function saveToHistory() {
 
 const actions = {
   goTo(screen) {
-    update({ screen, error: null });
+    update({ screen, error: null, viewingSession: null });
   },
 
   async startFromPdf(file) {
@@ -158,7 +159,7 @@ const actions = {
     const right = i === q.correctIndex;
     const { correct, total } = state.chunkScore;
     const results = [...state.results];
-    results[state.chunkIndex] = [...(results[state.chunkIndex] ?? []), { question: q.question, right }];
+    results[state.chunkIndex] = [...(results[state.chunkIndex] ?? []), { ...q, picked: i, right }];
     update({ picked: i, chunkScore: { correct: correct + (right ? 1 : 0), total }, results });
   },
 
@@ -195,6 +196,14 @@ const actions = {
       localStorage.setItem(SORT_KEY, historySort);
     } catch {}
     update({ historySort });
+  },
+
+  openSession(id) {
+    update({ viewingSession: id });
+  },
+
+  closeSession() {
+    update({ viewingSession: null });
   },
 
   deleteSession(id, name) {

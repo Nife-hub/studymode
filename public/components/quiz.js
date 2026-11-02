@@ -1,7 +1,7 @@
 // Quiz: 5 questions one at a time with right/wrong feedback, then the chunk score.
 import { el } from "../lib/dom.js";
 
-const LETTERS = ["A", "B", "C", "D"];
+export const LETTERS = ["A", "B", "C", "D"];
 
 export function quizView(state, actions) {
   const q = state.round.quiz[state.quizPos];
