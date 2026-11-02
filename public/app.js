@@ -3,6 +3,7 @@ import { chunkText } from "./lib/chunkText.js";
 import { fetchStudyRound } from "./lib/api.js";
 import { readPdf } from "./lib/readPdf.js";
 import { setUpThemeToggle } from "./lib/theme.js";
+import { saveSession, nameFromText } from "./lib/history.js";
 import { openingScreen } from "./screens/opening.js";
 import { homeScreen } from "./screens/home.js";
 import { studyScreen } from "./screens/study.js";
@@ -22,6 +23,9 @@ const freshState = () => ({
   picked: null,
   chunkScore: { correct: 0, total: 5 },
   sessionScore: { correct: 0, total: 0 },
+  sessionId: null,
+  name: "",
+  results: [], // per chunk: [{ question, right }]
   error: null,
 });
 
@@ -70,6 +74,21 @@ async function loadRound() {
   }
 }
 
+// Saves the session after a chunk's quiz. The chunk just quizzed is the last one done.
+function saveToHistory() {
+  const chunksDone = state.chunkIndex + 1;
+  saveSession({
+    id: state.sessionId,
+    name: state.name,
+    date: new Date().toISOString(),
+    score: state.sessionScore,
+    results: state.results,
+    chunksDone,
+    chunkCount: state.chunks.length,
+    finished: chunksDone === state.chunks.length,
+  });
+}
+
 const actions = {
   goTo(screen) {
     update({ screen, error: null });
@@ -78,19 +97,24 @@ const actions = {
   async startFromPdf(file) {
     update({ screen: "loading", error: null, chunks: [], chunkIndex: 0 });
     try {
-      actions.startStudying(await readPdf(file));
+      actions.startStudying(await readPdf(file), file.name.replace(/\.pdf$/i, ""));
     } catch (err) {
       update({ screen: "home", error: err.message });
     }
   },
 
-  startStudying(text) {
+  startStudying(text, name = "") {
     const chunks = chunkText(text);
     if (!chunks.length) {
       update({ screen: "home", error: "There's no text to study yet. Paste some notes first." });
       return;
     }
-    state = { ...freshState(), chunks };
+    state = {
+      ...freshState(),
+      chunks,
+      sessionId: crypto.randomUUID(),
+      name: name.trim() || nameFromText(text),
+    };
     loadRound();
   },
 
@@ -117,12 +141,16 @@ const actions = {
 
   answerQuestion(i) {
     if (state.picked !== null) return;
-    const right = i === state.round.quiz[state.quizPos].correctIndex;
+    const q = state.round.quiz[state.quizPos];
+    const right = i === q.correctIndex;
     const { correct, total } = state.chunkScore;
-    update({ picked: i, chunkScore: { correct: correct + (right ? 1 : 0), total } });
+    const results = [...state.results];
+    results[state.chunkIndex] = [...(results[state.chunkIndex] ?? []), { question: q.question, right }];
+    update({ picked: i, chunkScore: { correct: correct + (right ? 1 : 0), total }, results });
   },
 
-  // After the last question, the chunk's score is added to the session score.
+  // After the last question, the chunk's score is added to the session score
+  // and the session is saved to history.
   nextQuestion() {
     if (state.quizPos < state.round.quiz.length - 1) {
       update({ quizPos: state.quizPos + 1, picked: null });
@@ -133,6 +161,7 @@ const actions = {
       step: "score",
       sessionScore: { correct: correct + state.chunkScore.correct, total: total + state.chunkScore.total },
     });
+    saveToHistory();
   },
 
   nextChunk() {

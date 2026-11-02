@@ -17,6 +17,13 @@ export function homeScreen(state, actions) {
     onChange: (event) => actions.startFromPdf(event.target.files[0]),
   });
 
+  const nameBox = el("input", {
+    type: "text",
+    id: "paste-name",
+    class: "name-box",
+    placeholder: "e.g. Biology chapter 3. Leave empty to use the first few words.",
+  });
+
   const textBox = el("textarea", {
     placeholder: "Paste your notes or a few pages of text here…",
     "aria-label": "Paste your study text",
@@ -48,9 +55,11 @@ export function homeScreen(state, actions) {
       state.error && el("p", { class: "error", role: "alert" }, state.error),
       el("p", { class: "divider" }, "or"),
       el("h2", {}, "Paste text instead"),
+      el("label", { htmlFor: "paste-name" }, "Name (optional)"),
+      nameBox,
       textBox,
       el("div", { class: "actions" }, [
-        el("button", { class: "button", onClick: () => actions.startStudying(textBox.value) }, "Start studying"),
+        el("button", { class: "button", onClick: () => actions.startStudying(textBox.value, nameBox.value) }, "Start studying"),
       ]),
     ]),
   ]);

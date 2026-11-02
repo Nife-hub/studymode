@@ -239,6 +239,8 @@ textarea {
 
 textarea.short { min-height: 100px; }
 
+.name-box { margin-bottom: 12px; }
+
 textarea:focus,
 input[type="text"]:focus {
   outline: 2px solid var(--accent);
@@ -442,7 +444,8 @@ mark {
   margin-top: 20px;
 }
 
-.own-card-editor label {
+.own-card-editor label,
+.upload-card label[for="paste-name"] {
   display: block;
   margin: 12px 0 6px;
   font-weight: 600;
