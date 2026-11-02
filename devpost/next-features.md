@@ -6,7 +6,7 @@ status: draft
 # StudyMode — Next Features (after the hackathon)
 
 Planning notes for the first post-submission features. They come from `scope.md > Later` and `prd.md > Deferred From the POC`.
-Paused on 2026-11-02 ("i'll continue later"). See **Where We Left Off**.
+See **Where We Left Off**.
 
 ## Tech decision
 **Stay with plain JavaScript; don't switch to React yet.** The app already works with one `state` object and `render()`, and these features fit that pattern. *Recommended by the agent, accepted by the learner.* Revisit React if the code gets hard to manage, or as a separate learning project.
@@ -38,16 +38,57 @@ Saved data lives in the browser's **localStorage**, with no accounts and no serv
 - Pasted text: a new, optional **name box** next to the paste area. If it's left empty, the name is the **first few words of the text**. *Learner's choice.*
 
 ## Feature 2: Resume Where You Left Off
-- An unfinished session is saved together with the document's text, so it can be resumed without uploading again.
-- **When the app opens** and there's an unfinished session, the learner is asked: **continue** or **start over from the beginning**. *Learner's choice.*
+- Every unfinished session is saved together with the document's text, so it can be resumed without uploading again.
+- **Continue** and **Start over** buttons sit on each unfinished entry in the **History screen**, so the learner picks which document to go back to. The Opening Page stays as it is, with only **Get started**. *Learner's choice.*
 - Continue picks up at the **start of the next unfinished chunk**. Partial progress inside a chunk isn't kept. *Learner's choice.*
-- If a document is too big to fit in browser storage, show a friendly message; the score history is still saved.
+- Start over begins the same document from chunk 1 as a new session. The old entry stays in history, still marked unfinished, and its saved text moves to the new session so it isn't stored twice.
+- When a session is finished, its saved text is removed to free up space. Its score and questions stay in history.
 
-## Still open
-- Where the history screen is reached from (e.g. a button on the Home Page or the Finished Screen).
-- If the learner picks "start over": is the old unfinished entry kept in history, replaced, or removed?
-- If several sessions are unfinished, which one does the app ask about on open (probably the most recent)?
-- Deleting history entries: needed or not?
+## Storage
+- Browsers give each site about **5 MB** for this kind of storage. Only the saved document text takes up real space; scores and questions are tiny.
+- The History screen shows a **storage bar**, e.g. "Saved documents: 1.8 MB of about 5 MB". The limit is approximate because browsers don't report it exactly.
+- Each unfinished entry shows how much space its document takes, and has a **Remove saved document** button. That frees the space but keeps the score in history; the session can no longer be continued.
+- **When storage is full**, the study session keeps going and its score is still saved. A calm message says: "Storage is full, so this document can't be saved for later. Remove some saved documents in History to make space." After space is freed, the document is saved again the next time a chunk ends.
+- For scale: the 42,000-word test PDF from the final review is roughly 0.5 MB, so about 10 large documents fit.
+
+## Decided details
+*Suggested by the agent, accepted by the learner on 2026-11-02.*
+- **Where history is opened from:** a **History** button on both the Home Page and the Finished Screen.
+- **Deleting entries:** yes, each entry has a **Delete** button, which removes the entry and its saved document.
+- **Sorting history:** a **Sort by** menu with Newest first (the default), Oldest first, Highest score, Lowest score, and Name (A–Z). Scores are compared as percentages, so documents of different lengths compare fairly. The choice is remembered in this browser. *Learner's request.*
+
+## Build Steps
+Each step leaves the app working and gets its own commit.
+
+- [ ] **1. Save each session to history**
+  Becomes usable: Every finished chunk is saved in the browser. Nothing new is shown yet, but the saved data can be seen in the browser's developer tools (Application > Local Storage).
+  Build: Write `public/lib/history.js` to load, save, and delete sessions in localStorage, wrapped in try/catch like `theme.js`. Add an optional **name box** to the paste area in `home.js`. Add `sessionId`, `name`, and `results` (per chunk: each question and whether it was right) to `state`. Record each answer in `answerQuestion`, and save the session when a chunk's quiz ends and when the document is finished.
+  Verify: Study two chunks of `sample/sample-notes.pdf` and check that one entry appears with the file name, date, score, and "2 of N chunks", marked unfinished. Finish the document and check it becomes finished. Paste text with no name and check that the name is the first few words.
+  Commit: `Save study sessions to browser history`
+
+- [ ] **2. History screen with delete**
+  Becomes usable: A **History** button on the Home Page and the Finished Screen opens a list of past sessions (name, date, total score, or "Unfinished · 2 of 5 chunks"), each with **Delete**. Unfinished entries show **Continue** and **Start over** buttons, which come alive in Step 4. A **Sort by** menu above the list orders it by Newest first, Oldest first, Highest score, Lowest score, or Name (A–Z). An empty history shows a friendly line.
+  Build: Write `public/screens/history.js`, register it in `app.js`, add the buttons, a `deleteSession` action, and a `setHistorySort` action that remembers the choice in localStorage (wrapped in try/catch like `theme.js`). Add list styles.
+  Verify: The list matches what's in localStorage. Each sort option puts the entries in the expected order, and the chosen sort is still selected after a reload. Delete removes only that entry, and the deletion is still there after a reload.
+  Commit: `Add history screen`
+
+- [ ] **3. Session detail**
+  Becomes usable: Opening an entry shows every question grouped under its chunk, each marked right or wrong, with a **Back to history** button.
+  Build: Add the detail view to `history.js` (a `viewingSession` value in `state`), reusing the quiz's right/wrong colors.
+  Verify: A session with one wrong answer on purpose shows exactly that question as wrong, under the right chunk.
+  Commit: `Show each session's questions in history`
+
+- [ ] **4. Resume from history**
+  Becomes usable: **Continue** on an unfinished entry opens the start of its next unfinished chunk with the score so far. **Start over** begins the same document from chunk 1 as a new session.
+  Build: Save the chunks' text with every unfinished session in a separate localStorage key per session (so the history list loads fast), and remove it when the session is finished. Add `resumeSession` and `restartSession` actions, and wire up the buttons in `history.js`. An entry without saved text shows "Document not saved" instead of the buttons.
+  Verify: Stop document A after chunk 2 and document B after chunk 1. Reload, open History, and Continue A: chunk 3 loads with A's score kept. Continue B: chunk 2 loads. Start over on A: chunk 1 loads, and the old A entry stays unfinished without saved text. Finish a session and check its saved text is gone.
+  Commit: `Resume unfinished sessions from history`
+
+- [ ] **5. Storage bar and full-storage handling**
+  Becomes usable: The History screen shows how much of the roughly 5 MB is used, each unfinished entry shows its document size, and **Remove saved document** frees space while keeping the score. When storage is full, studying carries on and the calm "Storage is full" message appears.
+  Build: Add a size count to `history.js` (characters in the saved keys × 2 bytes, which is how browsers store them). Add the storage bar, sizes, and a `removeSavedDocument` action. Catch the browser's "quota exceeded" error when saving text, save the session without it, and show the message on the Study Screen.
+  Verify: The bar goes up after saving a document and down after removing one. Fill storage with a few very large pasted texts until the message appears; studying should continue, the score should still be saved, and after removing a document the next chunk saves the text again.
+  Commit: `Show storage use and handle full storage`
 
 ## Where We Left Off
-All core behavior for both features is decided. Next: answer the open questions above, then plan the build steps and start with Feature 1 (score history).
+Everything is decided and the build steps are planned. Next: commit this plan, then start Build Step 1 (save each session to history).
