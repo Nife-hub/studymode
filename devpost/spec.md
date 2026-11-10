@@ -234,12 +234,13 @@ A session is created when its first round loads, and a chunk is recorded when it
 
 ```
 studymode/
-├── package.json          # dependencies + "start" script (node --watch --env-file=.env server/index.js)
+├── package.json          # dependencies + "start" script (node --watch server/index.js)
 ├── .env.example          # ANTHROPIC_API_KEY= (template; the real .env stays private)
 ├── README.md             # what StudyMode is, setup, how to run, demo steps
 ├── sample/
 │   └── sample-notes.pdf  # a multi-page PDF known to work, for testing and the demo
 ├── server/               # the helper server (Node + Express)
+│   ├── loadEnv.js        # reads .env if it exists
 │   ├── index.js          # port 3000: serves public/, /vendor/pdfjs/, POST /api/study-round
 │   └── studyRound.js     # builds the Claude request, Zod schema, count checks
 ├── public/               # the page you see (plain HTML/CSS/JS, sent to the browser as is)
@@ -281,7 +282,7 @@ studymode/
   - Request: `POST /api/study-round`, body `{ chunkText: string, chunkNumber: number, totalChunks: number }`
   - Success: `200`, with the study round JSON
   - Failure: `500` `{ error: "friendly message" }`
-- **Key:** `ANTHROPIC_API_KEY` in `.env`, loaded with Node's `--env-file=.env`. The SDK reads it automatically. Getting a key needs a Claude Console account with prepaid credit; Claude Pro does not include API use.
+- **Key:** `ANTHROPIC_API_KEY` in `.env`, loaded at startup by `server/loadEnv.js` (Node's `process.loadEnvFile`; missing is fine). The SDK reads it automatically. Getting a key needs a Claude Console account with prepaid credit; Claude Pro does not include API use.
 - **Cost (rough estimate, check current pricing early in the build):** a chunk is about 1,000–1,500 words' worth of tokens in and about 2,000 out. On Opus 5.5 ($4 in / $20 out per million tokens), that's about **5¢ per chunk**, so about 50¢ for a 10-chunk document. Cost only comes from chunks actually studied.
   Pricing: https://platform.claude.com/docs/en/about-claude/pricing
 - **Rate limits:** one request every few minutes is far below new-account limits.

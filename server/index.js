@@ -1,4 +1,5 @@
 // The helper server: hands the page to the browser and keeps the Claude API key private.
+import "./loadEnv.js";
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
