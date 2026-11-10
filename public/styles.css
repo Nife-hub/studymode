@@ -234,7 +234,8 @@ p { margin: 0 0 16px; }
 
 /* Text boxes */
 textarea,
-input[type="text"] {
+input[type="text"],
+input[type="url"] {
   width: 100%;
   padding: 14px;
   border: 1px solid var(--border);
@@ -255,7 +256,8 @@ textarea.short { min-height: 100px; }
 .name-box { margin-bottom: 12px; }
 
 textarea:focus,
-input[type="text"]:focus {
+input[type="text"]:focus,
+input[type="url"]:focus {
   outline: 2px solid var(--accent);
   border-color: var(--primary);
 }
@@ -468,6 +470,9 @@ input[type="text"]:focus {
 }
 
 .pick-hint { text-align: center; margin: 4px 0 0; }
+.link-form .small { margin-top: 8px; }
+.error p { margin: 0; }
+.error .button { margin-top: 10px; }
 .picked-input { animation: fade-in 0.3s ease; }
 
 /* Loading */
@@ -537,7 +542,8 @@ mark {
 }
 
 .own-card-editor label,
-.upload-card label[for="paste-name"] {
+.upload-card label[for="paste-name"],
+.upload-card label[for="article-link"] {
   display: block;
   margin: 12px 0 6px;
   font-weight: 600;

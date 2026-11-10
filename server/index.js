@@ -4,6 +4,7 @@ import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { makeStudyRound } from "./studyRound.js";
+import { readArticle, ArticleError, CANT_READ } from "./article.js";
 
 const PORT = Number(process.env.PORT) || 3000;
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -40,6 +41,20 @@ app.post("/api/study-round", async (req, res) => {
   } catch (err) {
     console.error(`Chunk ${chunkNumber} failed:`, err.message);
     res.status(500).json({ error: FRIENDLY_ERROR });
+  }
+});
+
+// 5. A link in, the article's title and text out.
+app.post("/api/article", async (req, res) => {
+  const link = req.body?.url;
+  console.log(`Reading article: ${String(link).slice(0, 200)}`);
+  try {
+    res.json(await readArticle(link));
+    console.log("Article ready.");
+  } catch (err) {
+    const known = err instanceof ArticleError;
+    console.error(`Article failed: ${known ? err.reason : err.message}`);
+    res.status(422).json({ error: known ? err.message : CANT_READ });
   }
 });
 

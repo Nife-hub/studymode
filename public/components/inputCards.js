@@ -42,6 +42,7 @@ const PICTURES = {
 export const INPUT_KINDS = [
   ["pdf", "PDF", "Upload a PDF file"],
   ["docx", "Word document", "Upload a .docx file"],
+  ["web", "Web article", "Paste a link to a page"],
   ["paste", "Paste text", "Notes, an email, anything"],
 ];
 

@@ -3,7 +3,7 @@ import { el } from "../lib/dom.js";
 import { inputCards } from "../components/inputCards.js";
 
 const STEPS = [
-  ["📄", "Drop in your material.", "A PDF, a Word document, or your own notes."],
+  ["📄", "Drop in your material.", "A PDF, a Word document, a web article, or your own notes."],
   ["✨", "Get the key points.", "A short summary of one chunk, with the big ideas highlighted."],
   ["🃏", "Flip some flashcards.", "Pick how many you want, and add your own."],
   ["✅", "Take a quick quiz.", "Five questions, then on to the next chunk."],
@@ -42,6 +42,29 @@ function pasteArea(actions) {
   ];
 }
 
+// A link box. Enter or the button starts reading the article.
+function linkArea(actions) {
+  const linkBox = el("input", {
+    type: "url",
+    id: "article-link",
+    class: "link-box",
+    placeholder: "https://…",
+    autocomplete: "off",
+  });
+  return el("form", {
+    class: "link-form",
+    onSubmit: (event) => {
+      event.preventDefault();
+      actions.startFromLink(linkBox.value);
+    },
+  }, [
+    el("label", { htmlFor: "article-link" }, "Link to the article"),
+    linkBox,
+    el("p", { class: "soft small" }, "Works with most public pages: Wikipedia, news, blogs, course pages. Pages that need a login or a subscription can't be read."),
+    el("div", { class: "actions" }, [el("button", { class: "button", type: "submit" }, "Read article")]),
+  ]);
+}
+
 // Only the picked card's input is shown.
 function pickedInput(state, actions) {
   switch (state.inputKind) {
@@ -54,6 +77,8 @@ function pickedInput(state, actions) {
         "Choose a Word document",
         actions.startFromDocx
       );
+    case "web":
+      return linkArea(actions);
     case "paste":
       return pasteArea(actions);
     default:
@@ -82,7 +107,12 @@ export function homeScreen(state, actions) {
       el("h2", {}, "What are you studying from?"),
       inputCards(state, actions),
       el("div", { class: "picked-input" }, pickedInput(state, actions)),
-      state.error && el("p", { class: "error", role: "alert" }, state.error),
+      state.error &&
+        el("div", { class: "error", role: "alert" }, [
+          el("p", {}, state.error),
+          state.offerPaste &&
+            el("button", { class: "button secondary small-button", onClick: () => actions.pickInput("paste") }, "Paste text instead"),
+        ]),
     ]),
   ]);
 }

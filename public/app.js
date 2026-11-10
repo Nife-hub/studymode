@@ -3,6 +3,7 @@ import { chunkText } from "./lib/chunkText.js";
 import { fetchStudyRound } from "./lib/api.js";
 import { readPdf } from "./lib/readPdf.js";
 import { readDocx } from "./lib/readDocx.js";
+import { readArticle } from "./lib/readArticle.js";
 import { setUpThemeToggle } from "./lib/theme.js";
 import { saveSession, deleteSession, nameFromText, loadHistory, saveDocument, loadDocument, removeDocument } from "./lib/history.js";
 import { openingScreen } from "./screens/opening.js";
@@ -42,7 +43,8 @@ const freshState = () => ({
   viewingSession: null, // id of the session open in History
   restartedFrom: null, // after Start over: the old session whose saved text moves to this one
   storageFull: false, // true when this document's text couldn't be saved for later
-  inputKind: null, // the Home Page card picked: "pdf", "docx" or "paste"
+  inputKind: null, // the Home Page card picked: "pdf", "docx", "web" or "paste"
+  offerPaste: false, // a link couldn't be read, so the error offers "Paste text instead"
   source: "paste", // where this session's text came from: "pdf", "docx", "paste" or "web"
   error: null,
 });
@@ -131,7 +133,23 @@ const actions = {
 
   // Picking a card on the Home Page shows only that card's input.
   pickInput(inputKind) {
-    update({ inputKind, error: null });
+    update({ inputKind, error: null, offerPaste: false });
+  },
+
+  // Web articles are read by the helper server, then studied like pasted text,
+  // named after the article's title.
+  async startFromLink(url) {
+    if (!url.trim()) {
+      update({ error: "Paste a link to an article first.", offerPaste: false });
+      return;
+    }
+    update({ screen: "loading", error: null, offerPaste: false, chunks: [], chunkIndex: 0 });
+    try {
+      const { title, text } = await readArticle(url.trim());
+      actions.startStudying(text, title, "web");
+    } catch (err) {
+      update({ screen: "home", error: err.message, offerPaste: true });
+    }
   },
 
   // PDF and Word files are read in the browser, then studied like pasted text.

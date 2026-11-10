@@ -52,6 +52,7 @@ Traces `prd.md > The Core Journey`.
   Docs: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules · https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model
 - **Plain CSS** with color variables in one stylesheet.
   Docs: https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties
+- **@mozilla/readability** and **linkedom** (round 3) run on the helper: Readability finds an article's main text, and linkedom gives it a lightweight page to work on.
 - **mammoth** (round 3) reads Word `.docx` text in the browser, served from `node_modules` like PDF.js.
 - **PDF.js** (`pdfjs-dist` package) reads PDF text in the browser. The helper serves its files from `node_modules`, so there's no build tool and no internet connection needed. *Recommended, accepted.*
   Docs: https://mozilla.github.io/pdf.js/ · https://github.com/mozilla/pdf.js
@@ -119,6 +120,9 @@ File: `public/screens/opening.js`. Implements `prd.md > Opening Page`.
 ### Home Page
 Shows the hero, then three or four how-to steps, then the **input area**. Since round 3 this is a row of **picture cards** (PDF, Word document, Paste text; Web article in R3-2), each with a small inline SVG drawing colored by the `--pic-*` variables in both modes, with a hover bounce. Picking a card (`state.inputKind`) shows only its input: an upload box, or the name box + paste box with **Start studying**. Errors appear under the input area.
 Files: `public/screens/home.js`, `public/components/inputCards.js`. Implements `prd.md > Home Page`, `prd.md > States and Boundaries` (unusable-file error).
+
+### Web article reader (round 3)
+`public/lib/readArticle.js` sends the link to `POST /api/article`. `server/article.js` checks it's an `http(s)` link to a public address (every redirect is checked too), fetches it with a 10-second limit and a 5 MB cap, accepts only HTML, pulls out the main article with Readability (on a linkedom document), and turns each paragraph, heading and list item into a plain-text paragraph. Fewer than 150 words counts as unreadable. It returns `{ title, text }`; the session is named after the title and tagged **Link**.
 
 ### Word document reader (round 3)
 `public/lib/readDocx.js` loads mammoth's browser file from `/vendor/mammoth/` (a classic script that sets `window.mammoth`) and uses `extractRawText` on the `.docx`. A `.doc` gets a "save it as .docx" message; a broken file or fewer than about 50 words gets the unusable-file message. The session is named after the file, like a PDF.
@@ -226,6 +230,7 @@ studymode/
 │   └── sample-notes.pdf  # a multi-page PDF known to work, for testing and the demo
 ├── server/               # the helper server (Node + Express)
 │   ├── loadEnv.js        # reads .env if it exists
+│   ├── article.js        # web links: safe fetch + Readability → { title, text }
 │   ├── index.js          # port 3000: serves public/, /vendor/pdfjs/, POST /api/study-round
 │   └── studyRound.js     # builds the Claude request, Zod schema, count checks
 ├── public/               # the page you see (plain HTML/CSS/JS, sent to the browser as is)
@@ -247,6 +252,7 @@ studymode/
 │       ├── dom.js            # el() helper for building page elements safely
 │       ├── readPdf.js        # PDF.js: file → text (or "unusable file" error)
 │       ├── readDocx.js       # mammoth: Word .docx → text
+│       ├── readArticle.js    # calls /api/article
 │       ├── chunkText.js      # text → ~600–800-word chunks
 │       └── api.js            # calls /api/study-round
 └── devpost/              # Devpost learning workspace (planning docs)
@@ -281,7 +287,9 @@ Loaded with a `<link>` in `index.html`. If you're offline, the page falls back t
 
 ## Important Failure Modes
 
-- **Unusable file:** the file isn't a PDF, it's a scanned PDF with no text, or it can't be read → the Home Page shows "We couldn't read text from this file. Try another PDF, or paste your text below." The input stays ready. Implements `prd.md > States and Boundaries`.
+- **Unusable file:** the file isn't a PDF or `.docx`, it's a scanned PDF with no text, or it can't be read → the Home Page shows "We couldn't read text from this file. Try another PDF (or Word document), or pick Paste text instead." An old `.doc` gets "This looks like an older Word file (.doc)…". The input stays ready.
+- **Article can't be read** (round 3: login, paywall, blocked, 403/404, not a web page, over 5 MB, slower than 10 seconds, or under 150 words of article text) → "We couldn't read the article at this link…Try pasting the text instead." with a **Paste text instead** button that switches to the paste card. Text that isn't a link gets "That doesn't look like a web link…". The reason is printed in the terminal.
+- **Link to a private address** (this computer, a home or office network, cloud metadata), directly or through a redirect → refused with the same friendly message, so a hosted StudyMode can't be used to reach private machines. Known limit: the address is checked just before each request, not pinned during it. Implements `prd.md > States and Boundaries`.
 - **Claude call fails** (no key, wrong key, out of credit or over the spending limit, network down, or a reply in the wrong shape) → the loading icon is replaced by "We couldn't prepare this chunk. Check your connection and try again," with **Try again**, which re-sends the same chunk. Scores so far are kept. If the key is missing, the helper also prints a clear message in the terminal.
 - **Slow reply:** a round may take 10–30 seconds → the loading line says "This can take a few seconds…" and keeps spinning.
 

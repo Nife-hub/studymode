@@ -121,7 +121,7 @@ Build mode: fast. Each step leaves the app working and gets its own commit.
   Learner check: Open the Home Page and click each card. Upload `sample/sample-notes.docx` and study a chunk. Try it in dark mode and on a narrow window, and say whether the cards feel fun rather than generic.
   Commit: `Add picture-card picker and Word documents`
 
-- [ ] **R3-2. Web articles from a link**
+- [x] **R3-2. Web articles from a link**
   Becomes usable: A fourth card, **Web article**, shows a link box. The helper server fetches the page, pulls out the article's main text with Readability, and StudyMode studies it like any other document, named after the article's title. If the page can't be read (login, paywall, blocked, not a web page, or too little text), a friendly message suggests pasting the text instead, with a **Paste text instead** button that switches to that card.
   Why now: It's the riskiest piece (other people's websites, and a new server route), but the picker from R3-1 gives it a place to land, and the friendly-failure path reuses the paste card.
   Build: Add `@mozilla/readability` and `linkedom`. Write `server/article.js` and a `POST /api/article` route: only `http`/`https` links; refuse addresses on the computer or local network (so a hosted StudyMode can't be used to reach private machines); a 10-second time limit; a 5 MB size limit; HTML pages only. Write `public/lib/readArticle.js`, add the web card's illustration and link box, a `startFromLink` action, and the error with **Paste text instead**. Update `spec.md` (Components, External Services, Failure Modes).
