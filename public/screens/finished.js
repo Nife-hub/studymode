@@ -13,6 +13,7 @@ export function finishedScreen(state, actions) {
       el("p", { class: "soft" }, "Take a short break before your next one."),
       el("div", { class: "actions center" }, [
         el("button", { class: "button", onClick: actions.startOver }, "Upload another PDF"),
+        el("button", { class: "button secondary", onClick: () => actions.goTo("history") }, "See your history"),
       ]),
     ]),
   ]);

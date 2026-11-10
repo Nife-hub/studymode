@@ -3,11 +3,23 @@ import { chunkText } from "./lib/chunkText.js";
 import { fetchStudyRound } from "./lib/api.js";
 import { readPdf } from "./lib/readPdf.js";
 import { setUpThemeToggle } from "./lib/theme.js";
+import { saveSession, deleteSession, nameFromText } from "./lib/history.js";
 import { openingScreen } from "./screens/opening.js";
 import { homeScreen } from "./screens/home.js";
 import { studyScreen } from "./screens/study.js";
 import { finishedScreen } from "./screens/finished.js";
+import { historyScreen, SORTS } from "./screens/history.js";
 import { loadingView } from "./components/loading.js";
+
+const SORT_KEY = "studymode-history-sort";
+
+function savedSort() {
+  try {
+    const sort = localStorage.getItem(SORT_KEY);
+    if (sort in SORTS) return sort;
+  } catch {}
+  return "newest";
+}
 
 const freshState = () => ({
   screen: "opening",
@@ -22,6 +34,11 @@ const freshState = () => ({
   picked: null,
   chunkScore: { correct: 0, total: 5 },
   sessionScore: { correct: 0, total: 0 },
+  sessionId: null,
+  name: "",
+  results: [], // per chunk: [{ question, options, correctIndex, explanation, picked, right }]
+  historySort: savedSort(),
+  viewingSession: null, // id of the session open in History
   error: null,
 });
 
@@ -33,6 +50,7 @@ const screens = {
   loading: loadingView,
   study: studyScreen,
   finished: finishedScreen,
+  history: historyScreen,
 };
 
 let lastView = "";
@@ -70,27 +88,47 @@ async function loadRound() {
   }
 }
 
+// Saves the session after a chunk's quiz. The chunk just quizzed is the last one done.
+function saveToHistory() {
+  const chunksDone = state.chunkIndex + 1;
+  saveSession({
+    id: state.sessionId,
+    name: state.name,
+    date: new Date().toISOString(),
+    score: state.sessionScore,
+    results: state.results,
+    chunksDone,
+    chunkCount: state.chunks.length,
+    finished: chunksDone === state.chunks.length,
+  });
+}
+
 const actions = {
   goTo(screen) {
-    update({ screen, error: null });
+    update({ screen, error: null, viewingSession: null });
   },
 
   async startFromPdf(file) {
     update({ screen: "loading", error: null, chunks: [], chunkIndex: 0 });
     try {
-      actions.startStudying(await readPdf(file));
+      actions.startStudying(await readPdf(file), file.name.replace(/\.pdf$/i, ""));
     } catch (err) {
       update({ screen: "home", error: err.message });
     }
   },
 
-  startStudying(text) {
+  startStudying(text, name = "") {
     const chunks = chunkText(text);
     if (!chunks.length) {
       update({ screen: "home", error: "There's no text to study yet. Paste some notes first." });
       return;
     }
-    state = { ...freshState(), chunks };
+    state = {
+      ...freshState(),
+      chunks,
+      sessionId: crypto.randomUUID(),
+      name: name.trim() || nameFromText(text),
+    };
     loadRound();
   },
 
@@ -117,12 +155,16 @@ const actions = {
 
   answerQuestion(i) {
     if (state.picked !== null) return;
-    const right = i === state.round.quiz[state.quizPos].correctIndex;
+    const q = state.round.quiz[state.quizPos];
+    const right = i === q.correctIndex;
     const { correct, total } = state.chunkScore;
-    update({ picked: i, chunkScore: { correct: correct + (right ? 1 : 0), total } });
+    const results = [...state.results];
+    results[state.chunkIndex] = [...(results[state.chunkIndex] ?? []), { ...q, picked: i, right }];
+    update({ picked: i, chunkScore: { correct: correct + (right ? 1 : 0), total }, results });
   },
 
-  // After the last question, the chunk's score is added to the session score.
+  // After the last question, the chunk's score is added to the session score
+  // and the session is saved to history.
   nextQuestion() {
     if (state.quizPos < state.round.quiz.length - 1) {
       update({ quizPos: state.quizPos + 1, picked: null });
@@ -133,6 +175,7 @@ const actions = {
       step: "score",
       sessionScore: { correct: correct + state.chunkScore.correct, total: total + state.chunkScore.total },
     });
+    saveToHistory();
   },
 
   nextChunk() {
@@ -146,6 +189,37 @@ const actions = {
 
   retryChunk() {
     loadRound();
+  },
+
+  setHistorySort(historySort) {
+    try {
+      localStorage.setItem(SORT_KEY, historySort);
+    } catch {}
+    update({ historySort });
+  },
+
+  openSession(id) {
+    update({ viewingSession: id });
+  },
+
+  closeSession() {
+    update({ viewingSession: null });
+  },
+
+  deleteSession(id, name) {
+    if (!confirm(`Delete "${name}" from your history? This can't be undone.`)) return;
+    deleteSession(id);
+    render();
+  },
+
+  // Stopping mid-document: chunks with a finished quiz are already in history.
+  leaveStudy() {
+    const midChunk = state.step !== "score";
+    const message = midChunk
+      ? "Go back to the Home Page? Your progress in this chunk won't be kept, but finished chunks are saved in your history."
+      : "Go back to the Home Page? Your finished chunks are saved in your history.";
+    if (!confirm(message)) return;
+    actions.startOver();
   },
 
   startOver() {

@@ -239,6 +239,8 @@ textarea {
 
 textarea.short { min-height: 100px; }
 
+.name-box { margin-bottom: 12px; }
+
 textarea:focus,
 input[type="text"]:focus {
   outline: 2px solid var(--accent);
@@ -442,7 +444,8 @@ mark {
   margin-top: 20px;
 }
 
-.own-card-editor label {
+.own-card-editor label,
+.upload-card label[for="paste-name"] {
   display: block;
   margin: 12px 0 6px;
   font-weight: 600;
@@ -616,3 +619,166 @@ mark {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Back button at the top of a screen */
+.back-button {
+  padding: 8px 18px;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+/* History Screen */
+.sort-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.sort-row select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-small);
+  font: inherit;
+  font-weight: 400;
+  color: var(--text);
+  background: var(--surface);
+}
+
+.history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+}
+
+.history-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.history-info:hover .history-name { text-decoration: underline; }
+
+.history-info .small { margin: 0; }
+
+.history-name { overflow-wrap: anywhere; }
+
+.unfinished-tag {
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--highlight);
+  color: var(--highlight-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.history-score {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.small-button {
+  padding: 6px 14px;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+  .history-row { flex-wrap: wrap; }
+  .history-info { flex-basis: 100%; }
+}
+
+/* Session detail: a list of chunks; each opens to its questions, marked right or wrong */
+.chunk-list {
+  display: grid;
+  gap: 10px;
+}
+
+.chunk-results { padding: 0; }
+
+.chunk-results > summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 22px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.chunk-results > summary::-webkit-details-marker { display: none; }
+
+.chunk-results > summary::before {
+  content: "▸";
+  color: var(--primary);
+  transition: transform 0.2s ease;
+}
+
+.chunk-results[open] > summary::before { transform: rotate(90deg); }
+
+.chunk-title {
+  flex: 1;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.chunk-score { font-weight: 600; }
+
+.chunk-results .question-results { padding: 0 22px 18px; }
+
+.question-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.question-results details { border-radius: var(--radius-small); }
+.question-results details.correct { background: var(--correct-bg); }
+.question-results details.wrong { background: var(--wrong-bg); }
+
+.question-results summary {
+  display: flex;
+  gap: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.question-results summary::-webkit-details-marker { display: none; }
+
+.question-results .mark { font-weight: 700; }
+.question-results .correct .mark { color: var(--correct); }
+.question-results .wrong .mark { color: var(--wrong); }
+
+/* Answering a past question again */
+.practice {
+  padding: 4px 14px 14px;
+}
+
+.practice .feedback { margin-top: 12px; }
+.practice .small-button { margin-top: 4px; }
