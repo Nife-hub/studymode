@@ -43,6 +43,7 @@ const freshState = () => ({
   restartedFrom: null, // after Start over: the old session whose saved text moves to this one
   storageFull: false, // true when this document's text couldn't be saved for later
   inputKind: null, // the Home Page card picked: "pdf", "docx" or "paste"
+  source: "paste", // where this session's text came from: "pdf", "docx", "paste" or "web"
   error: null,
 });
 
@@ -111,6 +112,7 @@ function saveToHistory() {
     results: state.results,
     chunksDone,
     chunkCount: state.chunks.length,
+    source: state.source,
     finished,
   });
   if (finished) {
@@ -134,25 +136,25 @@ const actions = {
 
   // PDF and Word files are read in the browser, then studied like pasted text.
   // The session is named after the file.
-  async startFromFile(file, reader) {
+  async startFromFile(file, reader, source) {
     if (!file) return;
     update({ screen: "loading", error: null, chunks: [], chunkIndex: 0 });
     try {
-      actions.startStudying(await reader(file), file.name.replace(/\.(pdf|docx?)$/i, ""));
+      actions.startStudying(await reader(file), file.name.replace(/\.(pdf|docx?)$/i, ""), source);
     } catch (err) {
       update({ screen: "home", error: err.message });
     }
   },
 
   startFromPdf(file) {
-    return actions.startFromFile(file, readPdf);
+    return actions.startFromFile(file, readPdf, "pdf");
   },
 
   startFromDocx(file) {
-    return actions.startFromFile(file, readDocx);
+    return actions.startFromFile(file, readDocx, "docx");
   },
 
-  startStudying(text, name = "") {
+  startStudying(text, name = "", source = "paste") {
     const chunks = chunkText(text);
     if (!chunks.length) {
       update({ screen: "home", error: "There's no text to study yet. Paste some notes first." });
@@ -163,6 +165,7 @@ const actions = {
       chunks,
       sessionId: crypto.randomUUID(),
       name: name.trim() || nameFromText(text),
+      source,
     };
     loadRound();
   },
@@ -235,6 +238,7 @@ const actions = {
       chunkIndex: session.chunksDone,
       sessionId: session.id,
       name: session.name,
+      source: session.source,
       results: session.results,
       sessionScore: session.score,
     };
@@ -247,7 +251,7 @@ const actions = {
     const session = loadHistory().find((s) => s.id === id);
     const chunks = loadDocument(id);
     if (!session || !chunks) return;
-    state = { ...freshState(), chunks, sessionId: crypto.randomUUID(), name: session.name, restartedFrom: id };
+    state = { ...freshState(), chunks, sessionId: crypto.randomUUID(), name: session.name, source: session.source, restartedFrom: id };
     loadRound();
   },
 

@@ -107,6 +107,9 @@ Each step leaves the app working and gets its own commit.
 - **Only `.docx`** (Word's format since 2007). An old `.doc` gets a friendly message suggesting saving it as `.docx` or pasting the text. *Agent suggestion, accepted by the learner.*
 - **History names:** a Word document is named after its file name (like a PDF); a web article after its title. *Agent suggestion, accepted by the learner.*
 
+### History type tags (learner's request at the R3-1 check)
+- Each History entry shows a small tag for where it came from: **PDF**, **Word**, **Text** or **Link**, so sessions with the same name (e.g. the same notes as a PDF and a Word file) can be told apart. Sessions saved before this change have no tag. The learner found the cards "okay"; they may be improved later.
+
 ### Round 3 build steps
 Build mode: fast. Each step leaves the app working and gets its own commit.
 

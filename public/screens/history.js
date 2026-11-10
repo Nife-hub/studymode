@@ -70,10 +70,22 @@ function resumeButtons(s, actions) {
   ]);
 }
 
+// A small tag for where the session came from, so sessions with the same name
+// (say, the same notes as a PDF and a Word file) can be told apart.
+// Sessions saved before tags existed don't have one.
+const SOURCE_TAGS = { pdf: "PDF", docx: "Word", paste: "Text", web: "Link" };
+
+function sessionTitle(tag, s) {
+  return el(tag, { class: "history-name" }, [
+    s.source in SOURCE_TAGS && el("span", { class: `source-tag ${s.source}` }, SOURCE_TAGS[s.source]),
+    s.name,
+  ]);
+}
+
 function historyRow(s, actions) {
   return el("li", { class: "card history-row" }, [
     el("button", { class: "history-info", onClick: () => actions.openSession(s.id) }, [
-      el("strong", { class: "history-name" }, s.name),
+      sessionTitle("strong", s),
       el("span", { class: "soft small" }, `${formatDate(s.date)} · See questions →`),
       unfinishedTag(s),
     ]),
@@ -86,7 +98,7 @@ function historyRow(s, actions) {
 function sessionDetail(s, actions) {
   return el("main", { class: "screen" }, [
     el("button", { class: "button secondary back-button", onClick: actions.closeSession }, "← Back to history"),
-    el("h1", { class: "history-name" }, s.name),
+    sessionTitle("h1", s),
     el("p", { class: "soft" }, `${formatDate(s.date)} · Total score ${s.score.correct}/${s.score.total}`),
     unfinishedTag(s),
     el("p", { class: "soft hint" }, "Click a chunk to see its questions."),

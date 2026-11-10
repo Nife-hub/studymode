@@ -23,7 +23,7 @@
   --radius-small: 14px;
   --font-heading: "Fredoka", "Inter", system-ui, sans-serif;
   /* Home Page picture cards */
-  --pic-pdf: #c4524a;
+  --pic-pdf: #b5463f;
   --pic-docx: #2f5ea8;
   --pic-web: #2e7558;
   --pic-badge-text: #ffffff;
@@ -810,6 +810,25 @@ mark {
 .history-info .small { margin: 0; }
 
 .history-name { overflow-wrap: anywhere; }
+
+/* Where a session came from: PDF, Word, Text or Link */
+.source-tag {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 1px 8px;
+  border-radius: 6px;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  vertical-align: 0.15em;
+  color: var(--pic-badge-text);
+}
+
+.source-tag.pdf { background: var(--pic-pdf); }
+.source-tag.docx { background: var(--pic-docx); }
+.source-tag.web { background: var(--pic-web); }
+.source-tag.paste { background: var(--highlight); color: var(--highlight-text); }
 
 .unfinished-tag {
   align-self: flex-start;
