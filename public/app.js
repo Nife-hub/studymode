@@ -3,7 +3,7 @@ import { chunkText } from "./lib/chunkText.js";
 import { fetchStudyRound } from "./lib/api.js";
 import { readPdf } from "./lib/readPdf.js";
 import { setUpThemeToggle } from "./lib/theme.js";
-import { saveSession, deleteSession, nameFromText } from "./lib/history.js";
+import { saveSession, deleteSession, nameFromText, loadHistory, saveDocument, loadDocument, removeDocument } from "./lib/history.js";
 import { openingScreen } from "./screens/opening.js";
 import { homeScreen } from "./screens/home.js";
 import { studyScreen } from "./screens/study.js";
@@ -39,6 +39,7 @@ const freshState = () => ({
   results: [], // per chunk: [{ question, options, correctIndex, explanation, picked, right }]
   historySort: savedSort(),
   viewingSession: null, // id of the session open in History
+  restartedFrom: null, // after Start over: the old session whose saved text moves to this one
   error: null,
 });
 
@@ -89,8 +90,17 @@ async function loadRound() {
 }
 
 // Saves the session after a chunk's quiz. The chunk just quizzed is the last one done.
+// An unfinished session also keeps its document text so it can be continued later;
+// a finished one drops it to free up space.
 function saveToHistory() {
   const chunksDone = state.chunkIndex + 1;
+  const finished = chunksDone === state.chunks.length;
+  if (finished) removeDocument(state.sessionId);
+  else saveDocument(state.sessionId, state.chunks);
+  if (state.restartedFrom) {
+    removeDocument(state.restartedFrom);
+    state = { ...state, restartedFrom: null };
+  }
   saveSession({
     id: state.sessionId,
     name: state.name,
@@ -99,7 +109,7 @@ function saveToHistory() {
     results: state.results,
     chunksDone,
     chunkCount: state.chunks.length,
-    finished: chunksDone === state.chunks.length,
+    finished,
   });
 }
 
@@ -184,6 +194,33 @@ const actions = {
       return;
     }
     state = { ...state, chunkIndex: state.chunkIndex + 1 };
+    loadRound();
+  },
+
+  // Continue: back to the start of the next unfinished chunk, with the score so far.
+  resumeSession(id) {
+    const session = loadHistory().find((s) => s.id === id);
+    const chunks = loadDocument(id);
+    if (!session || !chunks) return;
+    state = {
+      ...freshState(),
+      chunks,
+      chunkIndex: session.chunksDone,
+      sessionId: session.id,
+      name: session.name,
+      results: session.results,
+      sessionScore: session.score,
+    };
+    loadRound();
+  },
+
+  // Start over: the same document from chunk 1, as a new session.
+  // The old entry stays in history; its saved text moves to the new session.
+  restartSession(id) {
+    const session = loadHistory().find((s) => s.id === id);
+    const chunks = loadDocument(id);
+    if (!session || !chunks) return;
+    state = { ...freshState(), chunks, sessionId: crypto.randomUUID(), name: session.name, restartedFrom: id };
     loadRound();
   },
 

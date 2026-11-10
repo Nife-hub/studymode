@@ -657,9 +657,19 @@ mark {
 
 .history-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   padding: 18px 22px;
+}
+
+/* Continue / Start over sit on their own line under an unfinished entry */
+.resume-row {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
 }
 
 .history-info {

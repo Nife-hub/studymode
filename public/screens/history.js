@@ -2,7 +2,7 @@
 // Opening one lists its chunks; clicking a chunk shows its questions, marked right or wrong,
 // and clicking a question lets the learner answer it again for revision.
 import { el } from "../lib/dom.js";
-import { loadHistory } from "../lib/history.js";
+import { loadHistory, loadDocument } from "../lib/history.js";
 import { LETTERS } from "../components/quiz.js";
 
 const percent = (s) => (s.score.total ? s.score.correct / s.score.total : 0);
@@ -45,6 +45,16 @@ const formatDate = (iso) => new Date(iso).toLocaleDateString(undefined, { day: "
 const unfinishedTag = (s) =>
   !s.finished && el("span", { class: "unfinished-tag" }, `Unfinished · ${s.chunksDone} of ${s.chunkCount} chunks`);
 
+// Continue / Start over for an unfinished session whose document is still saved.
+function resumeButtons(s, actions) {
+  if (s.finished) return false;
+  if (!loadDocument(s.id)) return el("p", { class: "soft small resume-row" }, "Document not saved");
+  return el("div", { class: "resume-row" }, [
+    el("button", { class: "button small-button", onClick: () => actions.resumeSession(s.id) }, "Continue"),
+    el("button", { class: "button secondary small-button", onClick: () => actions.restartSession(s.id) }, "Start over"),
+  ]);
+}
+
 function historyRow(s, actions) {
   return el("li", { class: "card history-row" }, [
     el("button", { class: "history-info", onClick: () => actions.openSession(s.id) }, [
@@ -54,6 +64,7 @@ function historyRow(s, actions) {
     ]),
     el("span", { class: "history-score" }, `${s.score.correct}/${s.score.total}`),
     el("button", { class: "button secondary small-button", onClick: () => actions.deleteSession(s.id, s.name) }, "Delete"),
+    resumeButtons(s, actions),
   ]);
 }
 
