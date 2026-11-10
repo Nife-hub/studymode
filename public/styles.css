@@ -613,6 +613,45 @@ mark {
   line-height: 1.1;
 }
 
+/* History */
+.top-actions { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.button.small-button { padding: 8px 18px; font-size: 0.95rem; }
+.name-box { margin-bottom: 12px; }
+.center-text { text-align: center; }
+
+.history-list {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.history-row.unfinished { border-left: 6px solid var(--accent); }
+.history-main { display: flex; flex-direction: column; min-width: 0; }
+.history-main .small { margin: 4px 0 0; }
+.history-name { overflow-wrap: anywhere; }
+
+.history-score {
+  flex-shrink: 0;
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }

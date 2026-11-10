@@ -59,10 +59,44 @@ Build mode: fast
   Learner check: Refresh the app and walk in from the Opening Page. Read the hero and steps and say whether they explain StudyMode the way you'd want a new student to hear it.
   Commit: `Add opening page, home intro, and friendly error recovery`
 
+### Round 2: Score history and resume (from `next-features.md`)
+
+- [x] **6. Your sessions are saved and listed on a History screen**
+  Becomes usable: Study a document and each finished chunk is saved in the browser. The Home Page has a **History** button and the Finished Screen has a **See history** link. Both open a list of past sessions showing the document name, date and total score. Sessions you didn't finish say "Unfinished · 2 of 5 chunks". Pasted text gets an optional name box; if it's empty, the first few words become the name.
+  Why now: Saving sessions is the base both features stand on. It's also the riskiest new piece: it's the first time StudyMode writes anything to the browser, and the shape of the saved data decides how easy the detail view and resume will be. Seeing the list early lets your feedback shape the rest.
+  PRD ref: `next-features.md > Feature 1: Score History` (What's saved, History list, Naming), `next-features.md > Decided on 2026-11-10` (reaching history)
+  Spec ref: `spec.md > Data Model`, `spec.md > File Structure`, `spec.md > Components` (Page pattern, Home Page, Finished Screen), `spec.md > Look and Feel`
+  Build: Write `public/lib/history.js` (load, save, update a session in localStorage, wrapped in try/catch so a blocked browser never breaks studying). Give each session an id, name, date, chunk count, chunks done, total score, and per-chunk question results. Create the entry when the first chunk's round loads, record every answer, and mark a chunk done when its score is reached. Add the name box to `home.js`, pass the PDF file name through `startFromPdf`, write `screens/history.js`, add the **History** button and **See history** link, add the styles. Update `spec.md > Data Model` and `File Structure`.
+  Verify (mechanical): In jsdom with a faked `/api/study-round`: study a 2-chunk paste with a typed name, getting one answer wrong. localStorage holds one session with the right name, total score and right/wrong results, and it's marked finished. A second session left after chunk 1 of 2 shows "Unfinished · 1 of 2 chunks". An empty name box gives the first few words. The PDF path uses the file name. With localStorage throwing, studying still works.
+  Learner check: Start the app, paste some notes with a name, study one chunk, then go back to start. Upload `sample/sample-notes.pdf` and finish it. Open **History** from the Home Page. You should see both sessions with names, dates and scores, and the first one marked unfinished.
+  Commit: `Save study sessions and add a history screen`
+
+- [ ] **7. Open a past session and delete ones you don't want**
+  Becomes usable: Tapping a session in History shows every quiz question grouped under its chunk, each marked right or wrong. Each session has a **Delete** button that asks you to confirm before removing it.
+  Why now: This completes score history using the data slice 6 already saves. No new risk, so it comes after the early feedback.
+  PRD ref: `next-features.md > Session detail`, `next-features.md > Decided on 2026-11-10` (deleting)
+  Spec ref: `spec.md > Data Model`, `spec.md > Look and Feel`
+  Build: Add a session detail view to `screens/history.js` (chunk headings, each question with your answer and the right answer, marked right or wrong), add `deleteSession` to `lib/history.js` with an inline "Delete this session? Yes / Cancel" confirmation, add `openSession` / `deleteSession` actions, add the styles.
+  Verify (mechanical): In jsdom: open a saved session and count the questions under each chunk and the right/wrong marks against the stored results. Delete → Cancel keeps it. Delete → Yes removes it from the list and from localStorage, along with any saved document text.
+  Learner check: Open a session from History and check the questions you got wrong are marked. Then delete one session, try Cancel first, then delete for real.
+  Commit: `Add session detail and delete to history`
+
+- [ ] **8. Pick up where you left off**
+  Becomes usable: Unfinished sessions keep their document text. When you open the app and there are unfinished sessions, the Opening Page shows a **Pick up where you left off** list. Each one has **Continue**, which jumps to the start of the next unfinished chunk with your score so far, and **Start over**, which restarts at chunk 1 and replaces that history entry. If a document is too big to save, you get a friendly note, and its score is still saved in history.
+  Why now: Resume needs everything slices 6 and 7 built. Coming last means we can test it against real saved sessions.
+  PRD ref: `next-features.md > Feature 2: Resume Where You Left Off`, `next-features.md > Decided on 2026-11-10` (start over, several unfinished)
+  Spec ref: `spec.md > Data Model`, `spec.md > Important Failure Modes`, `spec.md > Components > Opening Page`
+  Build: Save the chunk texts in a separate localStorage entry per session (so running out of space never blocks the history save), and remove them when a session finishes or is deleted. Add the resume list to `screens/opening.js`, plus `resumeSession` and `restartSession` actions (restart reuses the same history entry, reset to 0). Show the "too big to save" note on the study screen once. Update `spec.md > Important Failure Modes`.
+  Verify (mechanical): In jsdom: leave a 3-chunk session after chunk 1 and reload. The resume list shows it. **Continue** fetches chunk 2 with the session score kept. Leave two sessions unfinished and both are listed. **Start over** fetches chunk 1, score is 0/0, and history still has one entry for it. Finishing a session removes its saved text. Making the text save throw a quota error shows the friendly note while the history entry still updates.
+  Learner check: Start studying the sample PDF, finish one chunk, and close the tab. Reopen the app. You should be asked to continue. Press **Continue** and check you land on chunk 2 with your score kept. Then try **Start over** on another unfinished session.
+  Commit: `Resume unfinished sessions from the opening page`
+
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 1: first real key points from Claude, plus the look and feel. Feedback: it works, but the background was too bright for long study sessions; darkened it.
 - [x] Final kick-the-tires exploration and feedback completed
+- [ ] Round 2 early check — after slice 6: try saving and the History list; feedback can shape the detail view and resume
+- [ ] Round 2 final kick-the-tires — history, detail, delete and resume tried in a real browser
 
 ## Final Review
 
@@ -73,6 +107,7 @@ Build mode: fast
 - [x] Remove "The file stays on your computer…" line from the upload box
 - [x] Soft shadow on the upload section
 - [x] Final review complete — feedback resolved and learner confirms ready to ship
+- [ ] Round 2 review complete — feedback resolved and learner confirms history and resume are ready
 
 Review notes: the learner tried the full journey in a real browser, including PDF upload and the restyle ("it works"). A 100-page PDF gave the unusable-file message. A generated 95-page, 42,000-word PDF read fine (67 chunks), so size isn't the cause; the likely cause is a scanned PDF, which is a PRD Non-Goal. The learner chose to leave it as is; separate messages for scanned and unopenable PDFs were offered and declined.
 
@@ -87,6 +122,8 @@ Route and stops: Reference route only, not toured: `public/screens/home.js` (`st
 Edit outcome: Not applicable, since the learner asked to wrap up; the map lists where to make common changes.
 Reflection: Offered once as optional in the wrap-up message.
 Activity mode: Recap (no hands-on practice in the wrap-up).
+
+- [ ] Round 2: `devpost/app-map.html` updated with the history and resume files
 
 ## Revisions
 
