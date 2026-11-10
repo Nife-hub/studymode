@@ -16,8 +16,12 @@ app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(root, "public")));
 // 2. PDF.js's browser files, straight from node_modules.
 app.use("/vendor/pdfjs", express.static(path.join(root, "node_modules/pdfjs-dist/build")));
+// 3. mammoth's browser file, for reading Word documents.
+app.get("/vendor/mammoth/mammoth.browser.min.js", (req, res) => {
+  res.type("text/javascript").sendFile(path.join(root, "node_modules/mammoth/mammoth.browser.min.js"));
+});
 
-// 3. One chunk in, one study round out.
+// 4. One chunk in, one study round out.
 app.post("/api/study-round", async (req, res) => {
   const { chunkText, chunkNumber = 1, totalChunks = 1 } = req.body ?? {};
   if (typeof chunkText !== "string" || !chunkText.trim()) {

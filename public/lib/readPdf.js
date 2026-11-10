@@ -1,7 +1,7 @@
 // Reads the text out of a PDF, in the browser, using PDF.js served from /vendor/pdfjs/.
 import { countWords } from "./chunkText.js";
 
-export const UNUSABLE_FILE = "We couldn't read text from this file. Try another PDF, or paste your text below.";
+export const UNUSABLE_FILE = "We couldn't read text from this file. Try another PDF, or pick Paste text instead.";
 const MIN_WORDS = 50;
 
 export async function readPdf(file) {

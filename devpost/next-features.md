@@ -90,6 +90,44 @@ Each step leaves the app working and gets its own commit.
   Verify: The bar goes up after saving a document and down after removing one. Fill storage with a few very large pasted texts until the message appears; studying should continue, the score should still be saved, and after removing a document the next chunk saves the text again.
   Commit: `Show storage use and handle full storage`
 
+## Feature 3: Word Documents and Web Articles (round 3, planning)
+*Started 2026-11-10. From `scope.md > Later` and `prd.md > Deferred From the POC` (other file types).*
+
+### Home Page redesign (learner's design)
+- The input area becomes a choice of **four options: PDF, Word document (.docx), Web article, Paste text.**
+- Each option is a picture card, not plain text: an illustration or something fun for each, so it doesn't look generic.
+- **Picking an option** reveals only what that option needs: an upload box (PDF or Word), a link box (web article), or the paste box (text).
+
+### Web articles
+- **Any public site is allowed**: news, Wikipedia, blogs, school course pages, research articles. *Learner's choice.*
+
+- **When an article can't be read** (login, paywall, blocked, or no real text): a friendly message that suggests pasting the text instead, with a button that switches straight to the Paste text option. *Learner's choice; the button is an agent suggestion.*
+
+### Word documents and naming
+- **Only `.docx`** (Word's format since 2007). An old `.doc` gets a friendly message suggesting saving it as `.docx` or pasting the text. *Agent suggestion, accepted by the learner.*
+- **History names:** a Word document is named after its file name (like a PDF); a web article after its title. *Agent suggestion, accepted by the learner.*
+
+### Round 3 build steps
+Build mode: fast. Each step leaves the app working and gets its own commit.
+
+- [x] **R3-1. Picture-card picker on the Home Page, with Word documents**
+  Becomes usable: The Home Page input area becomes picture cards: **PDF**, **Word document** and **Paste text**, each with its own illustration and a little hover bounce. Picking a card shows only its input (upload box or paste box) and highlights the chosen card. Word `.docx` files are read in the browser and studied like PDFs, named after the file. An old `.doc` or broken file gets the friendly "save it as .docx or paste the text" message.
+  Why now: The redesign is the part of round 3 that's about how things look, so it's where your early feedback matters most. Word is the low-risk new option and fits straight into it. The web card joins in the next step.
+  Build: Add `mammoth` and serve its browser file at `/vendor/mammoth/` (like PDF.js). Write `public/lib/readDocx.js`. Rebuild the input area in `home.js` as a card picker (`state.inputKind`) with inline SVG illustrations that follow `spec.md > Look and Feel` in light and dark mode. Add a `startFromDocx` action, and the styles. Create `sample/sample-notes.docx`.
+  Verify: `/vendor/mammoth/mammoth.browser.min.js` returns 200 as JavaScript. In the simulated browser, each card shows only its own input. `sample/sample-notes.docx` (read in Node with the same mammoth code) gives the expected words and chunks, and the session is named after the file. A fake `.docx` and a `.doc` show the friendly message with no crash. PDF and Paste still work, and the round-2 history tests still pass.
+  Learner check: Open the Home Page and click each card. Upload `sample/sample-notes.docx` and study a chunk. Try it in dark mode and on a narrow window, and say whether the cards feel fun rather than generic.
+  Commit: `Add picture-card picker and Word documents`
+
+- [ ] **R3-2. Web articles from a link**
+  Becomes usable: A fourth card, **Web article**, shows a link box. The helper server fetches the page, pulls out the article's main text with Readability, and StudyMode studies it like any other document, named after the article's title. If the page can't be read (login, paywall, blocked, not a web page, or too little text), a friendly message suggests pasting the text instead, with a **Paste text instead** button that switches to that card.
+  Why now: It's the riskiest piece (other people's websites, and a new server route), but the picker from R3-1 gives it a place to land, and the friendly-failure path reuses the paste card.
+  Build: Add `@mozilla/readability` and `linkedom`. Write `server/article.js` and a `POST /api/article` route: only `http`/`https` links; refuse addresses on the computer or local network (so a hosted StudyMode can't be used to reach private machines); a 10-second time limit; a 5 MB size limit; HTML pages only. Write `public/lib/readArticle.js`, add the web card's illustration and link box, a `startFromLink` action, and the error with **Paste text instead**. Update `spec.md` (Components, External Services, Failure Modes).
+  Verify: `curl` the route with a real public article (for example a Wikipedia page) and get the title and a few hundred or more words. A login-only or empty page, a `localhost` link, a `file:` link and a link to a PDF each get the friendly error. In the simulated browser, the link flow studies chunk 1, and **Paste text instead** switches to the paste card.
+  Learner check: Paste a link to a Wikipedia page, then a news or blog article you'd really study, and check that the key points match the article. Then try a page that needs a login, and check you get the friendly message and the button works.
+  Commit: `Study web articles from a link`
+
+Afterwards: your final try of round 3, an app-map update, and pushing to GitHub.
+
 ## Where We Left Off
 Paused on 2026-11-02 ("ill continue later").
 - Steps 1 and 2 are done and checked by the learner.

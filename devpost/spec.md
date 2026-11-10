@@ -52,6 +52,7 @@ Traces `prd.md > The Core Journey`.
   Docs: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules · https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model
 - **Plain CSS** with color variables in one stylesheet.
   Docs: https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties
+- **mammoth** (round 3) reads Word `.docx` text in the browser, served from `node_modules` like PDF.js.
 - **PDF.js** (`pdfjs-dist` package) reads PDF text in the browser. The helper serves its files from `node_modules`, so there's no build tool and no internet connection needed. *Recommended, accepted.*
   Docs: https://mozilla.github.io/pdf.js/ · https://github.com/mozilla/pdf.js
 - **Node.js + Express** for the helper server, which also serves the page files. *Recommended and accepted as part of the two-part setup.*
@@ -116,8 +117,11 @@ Shows the name "StudyMode", a one-line description, and a **Get started** button
 File: `public/screens/opening.js`. Implements `prd.md > Opening Page`.
 
 ### Home Page
-Shows the hero, then three or four how-to steps, then the **input area**: a PDF upload box and a "paste text instead" text box with a **Start studying** button. Errors appear here, under the input area.
-File: `public/screens/home.js`. Implements `prd.md > Home Page`, `prd.md > States and Boundaries` (unusable-file error).
+Shows the hero, then three or four how-to steps, then the **input area**. Since round 3 this is a row of **picture cards** (PDF, Word document, Paste text; Web article in R3-2), each with a small inline SVG drawing colored by the `--pic-*` variables in both modes, with a hover bounce. Picking a card (`state.inputKind`) shows only its input: an upload box, or the name box + paste box with **Start studying**. Errors appear under the input area.
+Files: `public/screens/home.js`, `public/components/inputCards.js`. Implements `prd.md > Home Page`, `prd.md > States and Boundaries` (unusable-file error).
+
+### Word document reader (round 3)
+`public/lib/readDocx.js` loads mammoth's browser file from `/vendor/mammoth/` (a classic script that sets `window.mammoth`) and uses `extractRawText` on the `.docx`. A `.doc` gets a "save it as .docx" message; a broken file or fewer than about 50 words gets the unusable-file message. The session is named after the file, like a PDF.
 
 ### PDF text reader
 Takes the uploaded file and uses PDF.js, loaded from `/vendor/pdfjs/`, to pull out the text of every page, joined with paragraph breaks. If the file isn't a PDF, or the result has fewer than about 50 words (a scanned PDF), it reports an "unusable file" error.
@@ -162,7 +166,7 @@ File: `public/screens/finished.js`. Implements `prd.md > Finished Screen`.
 ### Helper server
 A small Express app on port 3000 that does three things:
 1. Serves the `public/` folder, which is the page itself.
-2. Serves PDF.js's browser files from `node_modules/pdfjs-dist/build` at `/vendor/pdfjs/`.
+2. Serves PDF.js's browser files from `node_modules/pdfjs-dist/build` at `/vendor/pdfjs/`, and mammoth's `mammoth.browser.min.js` at `/vendor/mammoth/`.
 3. Handles `POST /api/study-round`: it reads the API key from `.env`, checks that `chunkText` is present, calls Claude (see **External Services and Dependencies**), checks the reply's shape, and returns it.
 
 Files: `server/index.js`, `server/studyRound.js`. Serves `prd.md > Summary`, `prd.md > Flashcards`, `prd.md > Quiz and Score`.
@@ -242,6 +246,7 @@ studymode/
 │   └── lib/
 │       ├── dom.js            # el() helper for building page elements safely
 │       ├── readPdf.js        # PDF.js: file → text (or "unusable file" error)
+│       ├── readDocx.js       # mammoth: Word .docx → text
 │       ├── chunkText.js      # text → ~600–800-word chunks
 │       └── api.js            # calls /api/study-round
 └── devpost/              # Devpost learning workspace (planning docs)

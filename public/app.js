@@ -2,6 +2,7 @@
 import { chunkText } from "./lib/chunkText.js";
 import { fetchStudyRound } from "./lib/api.js";
 import { readPdf } from "./lib/readPdf.js";
+import { readDocx } from "./lib/readDocx.js";
 import { setUpThemeToggle } from "./lib/theme.js";
 import { saveSession, deleteSession, nameFromText, loadHistory, saveDocument, loadDocument, removeDocument } from "./lib/history.js";
 import { openingScreen } from "./screens/opening.js";
@@ -41,6 +42,7 @@ const freshState = () => ({
   viewingSession: null, // id of the session open in History
   restartedFrom: null, // after Start over: the old session whose saved text moves to this one
   storageFull: false, // true when this document's text couldn't be saved for later
+  inputKind: null, // the Home Page card picked: "pdf", "docx" or "paste"
   error: null,
 });
 
@@ -125,13 +127,29 @@ const actions = {
     update({ screen, error: null, viewingSession: null });
   },
 
-  async startFromPdf(file) {
+  // Picking a card on the Home Page shows only that card's input.
+  pickInput(inputKind) {
+    update({ inputKind, error: null });
+  },
+
+  // PDF and Word files are read in the browser, then studied like pasted text.
+  // The session is named after the file.
+  async startFromFile(file, reader) {
+    if (!file) return;
     update({ screen: "loading", error: null, chunks: [], chunkIndex: 0 });
     try {
-      actions.startStudying(await readPdf(file), file.name.replace(/\.pdf$/i, ""));
+      actions.startStudying(await reader(file), file.name.replace(/\.(pdf|docx?)$/i, ""));
     } catch (err) {
       update({ screen: "home", error: err.message });
     }
+  },
+
+  startFromPdf(file) {
+    return actions.startFromFile(file, readPdf);
+  },
+
+  startFromDocx(file) {
+    return actions.startFromFile(file, readDocx);
   },
 
   startStudying(text, name = "") {

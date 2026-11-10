@@ -18,7 +18,7 @@ export function loadingView(state, actions) {
 
   return el("main", { class: "screen loading", "aria-live": "polite" }, [
     el("div", { class: "spinner" }),
-    el("p", {}, state.chunks.length ? `Reading chunk ${chunkNumber}…` : "Reading your PDF…"),
+    el("p", {}, state.chunks.length ? `Reading chunk ${chunkNumber}…` : "Reading your file…"),
     el("p", { class: "soft" }, "This can take a few seconds…"),
   ]);
 }
