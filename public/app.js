@@ -3,12 +3,10 @@ import { chunkText } from "./lib/chunkText.js";
 import { fetchStudyRound } from "./lib/api.js";
 import { readPdf } from "./lib/readPdf.js";
 import { setUpThemeToggle } from "./lib/theme.js";
-import { createSession, recordChunk, nameFromText, nameFromFile } from "./lib/history.js";
 import { openingScreen } from "./screens/opening.js";
 import { homeScreen } from "./screens/home.js";
 import { studyScreen } from "./screens/study.js";
 import { finishedScreen } from "./screens/finished.js";
-import { historyScreen } from "./screens/history.js";
 import { loadingView } from "./components/loading.js";
 
 const freshState = () => ({
@@ -25,9 +23,6 @@ const freshState = () => ({
   chunkScore: { correct: 0, total: 5 },
   sessionScore: { correct: 0, total: 0 },
   error: null,
-  sessionId: null,
-  sessionName: "",
-  answers: [],
 });
 
 let state = freshState();
@@ -38,7 +33,6 @@ const screens = {
   loading: loadingView,
   study: studyScreen,
   finished: finishedScreen,
-  history: historyScreen,
 };
 
 let lastView = "";
@@ -63,11 +57,7 @@ async function loadRound() {
   update({ screen: "loading", error: null });
   try {
     const round = await fetchStudyRound(state.chunks[state.chunkIndex], state.chunkIndex + 1, state.chunks.length);
-    // The session goes into history once its first round has loaded.
-    const sessionId = state.sessionId ?? createSession(state.sessionName, state.chunks.length);
     update({
-      sessionId,
-      answers: [],
       screen: "study",
       round,
       step: "summary",
@@ -88,19 +78,19 @@ const actions = {
   async startFromPdf(file) {
     update({ screen: "loading", error: null, chunks: [], chunkIndex: 0 });
     try {
-      actions.startStudying(await readPdf(file), nameFromFile(file.name));
+      actions.startStudying(await readPdf(file));
     } catch (err) {
       update({ screen: "home", error: err.message });
     }
   },
 
-  startStudying(text, name = "") {
+  startStudying(text) {
     const chunks = chunkText(text);
     if (!chunks.length) {
       update({ screen: "home", error: "There's no text to study yet. Paste some notes first." });
       return;
     }
-    state = { ...freshState(), chunks, sessionName: name.trim() || nameFromText(text) };
+    state = { ...freshState(), chunks };
     loadRound();
   },
 
@@ -129,11 +119,7 @@ const actions = {
     if (state.picked !== null) return;
     const right = i === state.round.quiz[state.quizPos].correctIndex;
     const { correct, total } = state.chunkScore;
-    update({
-      picked: i,
-      answers: [...state.answers, i],
-      chunkScore: { correct: correct + (right ? 1 : 0), total },
-    });
+    update({ picked: i, chunkScore: { correct: correct + (right ? 1 : 0), total } });
   },
 
   // After the last question, the chunk's score is added to the session score.
@@ -143,11 +129,10 @@ const actions = {
       return;
     }
     const { correct, total } = state.sessionScore;
-    const sessionScore = { correct: correct + state.chunkScore.correct, total: total + state.chunkScore.total };
-    // Save this chunk to history: each question with the answer that was picked.
-    const questions = state.round.quiz.map((q, n) => ({ ...q, picked: state.answers[n] ?? null }));
-    recordChunk(state.sessionId, state.chunkIndex, questions, sessionScore);
-    update({ step: "score", sessionScore });
+    update({
+      step: "score",
+      sessionScore: { correct: correct + state.chunkScore.correct, total: total + state.chunkScore.total },
+    });
   },
 
   nextChunk() {

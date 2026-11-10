@@ -176,7 +176,7 @@ Rough size: a few hours of guided work once the app runs. Best done after submis
 
 ## Data Model
 
-Everything for the current session lives in one `state` object in `public/app.js`, in the page's memory. Since round 2, score history is also saved in the browser's localStorage (see **Saved in the browser** below). Nothing goes to a server or database.
+Everything lives in one `state` object in `public/app.js`, in the page's memory. Nothing is written to disk, the browser, or a database.
 
 | Data | Shape | Updated by | After closing or refreshing |
 |---|---|---|---|
@@ -191,9 +191,6 @@ Everything for the current session lives in one `state` object in `public/app.js
 | `chunkScore` | `{ correct, total: 5 }` | `answerQuestion` | Gone |
 | `sessionScore` | `{ correct, total }` | Adding each finished chunk's score | Gone |
 | `error` | string or null | Failed read or fetch | Gone |
-| `sessionId` | id of this session's history entry, or null | First round loaded | Gone (the entry itself is saved) |
-| `sessionName` | PDF file name, the name box, or the text's first words | `startStudying` | Gone |
-| `answers` | option picked for each question in this chunk | `answerQuestion` | Gone |
 
 **Study round** (what the helper returns for one chunk):
 
@@ -211,24 +208,6 @@ Everything for the current session lives in one `state` object in `public/app.js
 ```
 
 Rules: 3–5 `keyPoints`, exactly 10 `flashcards`, exactly 5 `quiz` items, each with 4 `options`. The helper checks the counts. If there are too many it trims them; if there are too few it treats the reply as an error.
-
-**Saved in the browser** (`public/lib/history.js`, localStorage key `studymode-history`, newest first). Every read and write is wrapped in try/catch, so blocked storage never stops studying.
-
-```json
-[{
-  "id": "1762780000000-k3j9qa",
-  "name": "Biology week 3",
-  "date": "2026-11-10T14:05:00.000Z",
-  "chunkCount": 5,
-  "chunksDone": 2,
-  "correct": 9,
-  "total": 10,
-  "finished": false,
-  "chunks": [{ "questions": [{ "question": "...", "options": ["..."], "correctIndex": 1, "explanation": "...", "picked": 2 }] }]
-}]
-```
-
-A session is created when its first round loads, and a chunk is recorded when its score is reached.
 
 ## File Structure
 
@@ -251,8 +230,7 @@ studymode/
 │   │   ├── opening.js
 │   │   ├── home.js           # hero, steps, upload + paste, error message
 │   │   ├── study.js          # progress line; summary → flashcards → quiz → score
-│   │   ├── finished.js
-│   │   └── history.js        # past sessions list
+│   │   └── finished.js
 │   ├── components/
 │   │   ├── loading.js
 │   │   ├── summary.js        # key points with highlighted terms
@@ -263,7 +241,6 @@ studymode/
 │       ├── dom.js            # el() helper for building page elements safely
 │       ├── readPdf.js        # PDF.js: file → text (or "unusable file" error)
 │       ├── chunkText.js      # text → ~600–800-word chunks
-│       ├── history.js        # score history in localStorage
 │       └── api.js            # calls /api/study-round
 └── devpost/              # Devpost learning workspace (planning docs)
 ```

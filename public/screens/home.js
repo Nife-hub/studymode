@@ -17,23 +17,12 @@ export function homeScreen(state, actions) {
     onChange: (event) => actions.startFromPdf(event.target.files[0]),
   });
 
-  const nameBox = el("input", {
-    type: "text",
-    class: "name-box",
-    placeholder: "Name this session (optional)",
-    "aria-label": "Name this session (optional)",
-    maxLength: 80,
-  });
-
   const textBox = el("textarea", {
     placeholder: "Paste your notes or a few pages of text here…",
     "aria-label": "Paste your study text",
   });
 
   return el("main", { class: "screen" }, [
-    el("div", { class: "top-actions" }, [
-      el("button", { class: "button secondary small-button", onClick: () => actions.goTo("history") }, "📊 History"),
-    ]),
     el("section", { class: "hero" }, [
       el("h1", {}, "Turn that never-ending PDF into quick, easy wins."),
       el("p", { class: "soft" }, "Bite-sized chunks, flashcards and mini quizzes, so you actually make it to the last page."),
@@ -59,10 +48,9 @@ export function homeScreen(state, actions) {
       state.error && el("p", { class: "error", role: "alert" }, state.error),
       el("p", { class: "divider" }, "or"),
       el("h2", {}, "Paste text instead"),
-      nameBox,
       textBox,
       el("div", { class: "actions" }, [
-        el("button", { class: "button", onClick: () => actions.startStudying(textBox.value, nameBox.value) }, "Start studying"),
+        el("button", { class: "button", onClick: () => actions.startStudying(textBox.value) }, "Start studying"),
       ]),
     ]),
   ]);

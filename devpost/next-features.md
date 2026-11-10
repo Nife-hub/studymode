@@ -1,6 +1,6 @@
 ---
 doc: next-features
-status: approved
+status: draft
 ---
 
 # StudyMode — Next Features (after the hackathon)
@@ -43,11 +43,11 @@ Saved data lives in the browser's **localStorage**, with no accounts and no serv
 - Continue picks up at the **start of the next unfinished chunk**. Partial progress inside a chunk isn't kept. *Learner's choice.*
 - If a document is too big to fit in browser storage, show a friendly message; the score history is still saved.
 
-## Decided on 2026-11-10
-- **Reaching history:** a "History" button on the Home Page, plus a "See history" link on the Finished Screen. *Agent recommended, learner accepted.*
-- **Start over:** the new attempt **replaces** the old unfinished entry in history. *Learner's choice.*
-- **Several unfinished sessions:** when the app opens, the learner **picks from a list** of all unfinished sessions, or starts over. *Learner's choice.*
-- **Deleting:** each history entry has a **delete button**, with a confirmation. *Learner's choice.*
+## Still open
+- Where the history screen is reached from (e.g. a button on the Home Page or the Finished Screen).
+- If the learner picks "start over": is the old unfinished entry kept in history, replaced, or removed?
+- If several sessions are unfinished, which one does the app ask about on open (probably the most recent)?
+- Deleting history entries: needed or not?
 
 ## Where We Left Off
-All behavior for both features is decided. Next: plan the build steps and start with Feature 1 (score history).
+All core behavior for both features is decided. Next: answer the open questions above, then plan the build steps and start with Feature 1 (score history).
