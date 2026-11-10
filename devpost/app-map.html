@@ -50,12 +50,22 @@
 <body>
 <main>
   <h1>StudyMode: App Map</h1>
-  <p class="soft">A one-page guide to how your app fits together and where to make changes. It's a snapshot of commit <code>b143b91</code>, so it may drift as the code changes.</p>
+  <p class="soft">A one-page guide to how your app fits together and where to make changes. It's a snapshot of the code after round 2 (score history and resume, November 2026), so it may drift as the code changes.</p>
 
   <section aria-labelledby="what">
     <h2 id="what">What it is, in two parts</h2>
     <p><strong>The page you see</strong> (<code>public/</code>) is plain HTML, CSS and JavaScript. It reads your PDF in the browser, cuts the text into chunks of about 600–800 words, and shows the screens. Everything you're doing right now lives in one object called <code>state</code> in <code>public/app.js</code>. Each change to <code>state</code> goes through a small <em>action</em> function and then redraws the page with <code>render()</code>.</p>
     <p><strong>The helper server</strong> (<code>server/</code>) hands the page to your browser and keeps your Claude API key private. For each chunk you study, it asks Claude for key points, 10 flashcards and a 5-question quiz.</p>
+  </section>
+
+  <section aria-labelledby="saved">
+    <h2 id="saved">What's saved in your browser (round 2)</h2>
+    <p>History lives in the browser's <em>localStorage</em>, so there are no accounts and the server doesn't change. Everything about it is in <code>public/lib/history.js</code>:</p>
+    <ul>
+      <li><code>studymode-history</code>: every session's name, date, score and each question with your answer. Saved by <code>saveToHistory</code> in <code>public/app.js</code> each time a chunk's quiz ends.</li>
+      <li><code>studymode-doc-&lt;id&gt;</code>: an unfinished session's text, so <strong>Continue</strong> works without uploading again. Removed when you finish the document, delete the session, or press <strong>Remove saved document</strong>.</li>
+    </ul>
+    <p>The screens are in <code>public/screens/history.js</code>: the list with Sort by and the storage bar, a session's chunks and questions, and the Continue / Start over buttons. Those buttons call <code>resumeSession</code> and <code>restartSession</code> in <code>app.js</code>.</p>
   </section>
 
   <section aria-labelledby="flow">
@@ -114,6 +124,9 @@
         <tr><td>What Claude writes, and its tone</td><td><code>SYSTEM_PROMPT</code> in <code>server/studyRound.js</code></td></tr>
         <tr><td>How long a chunk is</td><td><code>TARGET</code> and <code>MAX</code> in <code>public/lib/chunkText.js</code></td></tr>
         <tr><td>Which Claude model (cost vs quality)</td><td><code>model:</code> in <code>server/studyRound.js</code></td></tr>
+        <tr><td>History sort options</td><td><code>SORTS</code> in <code>public/screens/history.js</code></td></tr>
+        <tr><td>The "about 5 MB" storage estimate</td><td><code>STORAGE_LIMIT</code> in <code>public/lib/history.js</code></td></tr>
+        <tr><td>The "Storage is full" wording</td><td><code>public/screens/study.js</code></td></tr>
         <tr><td>Quiz encouragement messages</td><td><code>encouragement</code> in <code>public/components/quiz.js</code></td></tr>
       </tbody>
     </table>
@@ -127,11 +140,15 @@
       <summary>Related: test a guess before acting on it</summary>
       <p>When a 100-page PDF failed, the first guess was "it's too big". Instead of changing code, the agent made a 95-page test PDF and ran it through <code>public/lib/readPdf.js</code>. It worked (67 chunks), which ruled size out and pointed to a scanned PDF. Asking an agent to <em>check</em> a guess first is often faster than fixing the wrong thing.</p>
     </details>
+    <details>
+      <summary>Related: check GitHub before starting new work</summary>
+      <p>In round 2, history was planned and built again on this computer while a more complete version, built in an earlier session, was already on GitHub. A <code>git fetch</code> showed it, the duplicate was set aside with a revert (nothing lost), and work carried on from the GitHub version. When you switch computers or sessions, ask the agent to <code>git pull</code> (or at least <code>git fetch</code>) first.</p>
+    </details>
   </section>
 
   <section aria-labelledby="run">
     <h2 id="run">Run it again</h2>
-    <p>In the <code>studymode</code> folder: <code>npm start</code>, then open <code>http://localhost:3000</code>. Your key lives in <code>.env</code>, which git ignores. A PDF known to work is in <code>sample/sample-notes.pdf</code>.</p>
+    <p>In the <code>studymode</code> folder: <code>npm start</code>, then open <code>http://localhost:3000</code>. Your key lives in <code>.env</code>, which git ignores and is never on GitHub. On a new computer, copy <code>.env.example</code> to <code>.env</code> and paste the key (or a new one from the Claude Console). The live site on Render keeps its own copy in Render's Environment settings. A PDF known to work is in <code>sample/sample-notes.pdf</code>.</p>
   </section>
 </main>
 </body>
