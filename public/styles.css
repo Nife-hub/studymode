@@ -394,11 +394,17 @@ input[type="url"]:focus {
 }
 
 /* Picture cards: pick how the study material comes in */
+.input-section { margin-bottom: 20px; }
+
+/* One straight row on a laptop; two by two on a narrow screen */
 .input-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 14px;
-  margin-bottom: 20px;
+}
+
+@media (max-width: 640px) {
+  .input-cards { grid-template-columns: repeat(2, 1fr); }
 }
 
 .input-card {
@@ -409,7 +415,8 @@ input[type="url"]:focus {
   padding: 14px 10px 16px;
   border: 2px solid var(--border);
   border-radius: var(--radius);
-  background: var(--bg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
   color: var(--text);
   font: inherit;
   text-align: center;

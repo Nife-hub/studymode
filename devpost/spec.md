@@ -118,7 +118,7 @@ Shows the name "StudyMode", a one-line description, and a **Get started** button
 File: `public/screens/opening.js`. Implements `prd.md > Opening Page`.
 
 ### Home Page
-Shows the hero, then three or four how-to steps, then the **input area**. Since round 3 this is a row of **picture cards** (PDF, Word document, Paste text; Web article in R3-2), each with a small inline SVG drawing colored by the `--pic-*` variables in both modes, with a hover bounce. Picking a card (`state.inputKind`) shows only its input: an upload box, or the name box + paste box with **Start studying**. Errors appear under the input area.
+Shows the hero, then three or four how-to steps, then the **input area**. Since round 3 this is a row of **picture cards** sitting straight on the page (one row of four on a laptop, two by two under 640px; the learner asked to remove the box around them) (PDF, Word document, Paste text; Web article in R3-2), each with a small inline SVG drawing colored by the `--pic-*` variables in both modes, with a hover bounce. Picking a card (`state.inputKind`) shows only its input, in its own panel below the cards: an upload box, or the name box + paste box with **Start studying**. Errors appear under the input area.
 Files: `public/screens/home.js`, `public/components/inputCards.js`. Implements `prd.md > Home Page`, `prd.md > States and Boundaries` (unusable-file error).
 
 ### Web article reader (round 3)

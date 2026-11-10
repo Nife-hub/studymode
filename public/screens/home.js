@@ -103,10 +103,13 @@ export function homeScreen(state, actions) {
           ])
         )),
     ]),
-    el("section", { class: "card upload-card" }, [
+    // The cards sit straight on the page in one row; the picked one's input appears below in a panel.
+    el("section", { class: "input-section" }, [
       el("h2", {}, "What are you studying from?"),
       inputCards(state, actions),
-      el("div", { class: "picked-input" }, pickedInput(state, actions)),
+    ]),
+    el("section", { class: state.inputKind ? "card upload-card picked-input" : "picked-input" }, [
+      ...[].concat(pickedInput(state, actions)),
       state.error &&
         el("div", { class: "error", role: "alert" }, [
           el("p", {}, state.error),

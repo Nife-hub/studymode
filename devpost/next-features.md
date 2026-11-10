@@ -109,6 +109,7 @@ Each step leaves the app working and gets its own commit.
 
 ### History type tags (learner's request at the R3-1 check)
 - Each History entry shows a small tag for where it came from: **PDF**, **Word**, **Text** or **Link**, so sessions with the same name (e.g. the same notes as a PDF and a Word file) can be told apart. Sessions saved before this change have no tag. The learner found the cards "okay"; they may be improved later.
+- At the R3-2 check, the learner asked to take the cards out of the big box: they now sit in one straight row on a laptop and wrap two by two on narrow screens, with the picked input in its own panel below.
 
 ### Round 3 build steps
 Build mode: fast. Each step leaves the app working and gets its own commit.
