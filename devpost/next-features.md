@@ -95,3 +95,5 @@ Paused on 2026-11-02 ("ill continue later").
 - Steps 1 and 2 are done and checked by the learner.
 - Step 3 is built and committed: chunks open one at a time, and questions can be answered again for revision. **Still to do:** the learner's check of Step 3 (open a chunk, practise a wrong question, try it in dark mode). Sessions saved before this change only have the question text, so their questions can't be practised.
 - Next: after that check, mark Step 3 done and start Step 4 (Continue and Start over from History).
+
+Update on 2026-11-10: a session on another computer copy, unaware of the work above, re-planned and rebuilt Step 1. The learner chose to keep this version, so that rebuild was reverted and these decisions stand (resume from History; Start over makes a new session). Fixed a Step 3 bug where "false" showed as text under a practised question. `.env` is now read by `server/loadEnv.js`. Still next: the learner's check of Step 3.

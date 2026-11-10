@@ -106,7 +106,8 @@ function practice(a) {
       ]);
     });
     const right = picked === a.correctIndex;
-    box.replaceChildren(
+    // Built with el() so the "answered && …" parts that are false are skipped, not shown as text.
+    box.replaceChildren(...el("div", {}, [
       el("div", { class: "options" }, options),
       answered &&
         el("div", { class: right ? "feedback correct" : "feedback wrong", role: "status" }, [
@@ -114,8 +115,8 @@ function practice(a) {
           el("span", {}, ` · ${a.explanation}`),
         ]),
       answered && el("p", { class: "soft small" }, `The first time, you picked ${LETTERS[a.picked]}.`),
-      answered && el("button", { class: "button secondary small-button", onClick: () => show(null) }, "Try again")
-    );
+      answered && el("button", { class: "button secondary small-button", onClick: () => show(null) }, "Try again"),
+    ]).childNodes);
   };
   show(null);
   return box;
