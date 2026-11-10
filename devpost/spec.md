@@ -209,7 +209,7 @@ Everything lives in one `state` object in `public/app.js`, in the page's memory.
 
 Rules: 3–5 `keyPoints`, exactly 10 `flashcards`, exactly 5 `quiz` items, each with 4 `options`. The helper checks the counts. If there are too many it trims them; if there are too few it treats the reply as an error.
 
-**Saved in the browser (round 2, see `next-features.md`).** `public/lib/history.js` keeps past sessions in localStorage under `studymode-history` (`id`, `name`, `date`, `score`, `results` per chunk, `chunksDone`, `chunkCount`, `finished`). An unfinished session's chunk texts are kept under `studymode-doc-<id>` so it can be continued, and removed when it's finished or deleted. Every read and write is wrapped in try/catch.
+**Saved in the browser (round 2, see `next-features.md`).** `public/lib/history.js` keeps past sessions in localStorage under `studymode-history` (`id`, `name`, `date`, `score`, `results` per chunk, `chunksDone`, `chunkCount`, `finished`). An unfinished session's chunk texts are kept under `studymode-doc-<id>` so it can be continued, and removed when it's finished, deleted, or removed with **Remove saved document**. The score is saved before the text, so full storage never loses a score; the Study Screen then shows a calm "Storage is full" note, and the text is tried again after the next chunk. The History screen's storage bar estimates use as characters × 2 bytes against about 5 MB. Every read and write is wrapped in try/catch.
 
 ## File Structure
 

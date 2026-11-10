@@ -40,6 +40,7 @@ const freshState = () => ({
   historySort: savedSort(),
   viewingSession: null, // id of the session open in History
   restartedFrom: null, // after Start over: the old session whose saved text moves to this one
+  storageFull: false, // true when this document's text couldn't be saved for later
   error: null,
 });
 
@@ -92,11 +93,10 @@ async function loadRound() {
 // Saves the session after a chunk's quiz. The chunk just quizzed is the last one done.
 // An unfinished session also keeps its document text so it can be continued later;
 // a finished one drops it to free up space.
+// The score is saved first, so a full storage never costs the learner their score.
 function saveToHistory() {
   const chunksDone = state.chunkIndex + 1;
   const finished = chunksDone === state.chunks.length;
-  if (finished) removeDocument(state.sessionId);
-  else saveDocument(state.sessionId, state.chunks);
   if (state.restartedFrom) {
     removeDocument(state.restartedFrom);
     state = { ...state, restartedFrom: null };
@@ -111,6 +111,13 @@ function saveToHistory() {
     chunkCount: state.chunks.length,
     finished,
   });
+  if (finished) {
+    removeDocument(state.sessionId);
+    state = { ...state, storageFull: false };
+  } else {
+    // If storage is full, studying carries on; the text is tried again after the next chunk.
+    state = { ...state, storageFull: !saveDocument(state.sessionId, state.chunks) };
+  }
 }
 
 const actions = {
@@ -181,11 +188,13 @@ const actions = {
       return;
     }
     const { correct, total } = state.sessionScore;
-    update({
+    state = {
+      ...state,
       step: "score",
       sessionScore: { correct: correct + state.chunkScore.correct, total: total + state.chunkScore.total },
-    });
-    saveToHistory();
+    };
+    saveToHistory(); // before drawing, so a "storage is full" note shows straight away
+    render();
   },
 
   nextChunk() {
@@ -241,6 +250,13 @@ const actions = {
 
   closeSession() {
     update({ viewingSession: null });
+  },
+
+  // Frees the space a document takes. Its score and questions stay in history.
+  removeSavedDocument(id, name) {
+    if (!confirm(`Remove the saved document for "${name}"? Its score stays in your history, but it can't be continued.`)) return;
+    removeDocument(id);
+    render();
   },
 
   deleteSession(id, name) {

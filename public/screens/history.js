@@ -2,7 +2,7 @@
 // Opening one lists its chunks; clicking a chunk shows its questions, marked right or wrong,
 // and clicking a question lets the learner answer it again for revision.
 import { el } from "../lib/dom.js";
-import { loadHistory, loadDocument } from "../lib/history.js";
+import { loadHistory, loadDocument, documentSize, savedDocumentsSize, formatSize, STORAGE_LIMIT } from "../lib/history.js";
 import { LETTERS } from "../components/quiz.js";
 
 const percent = (s) => (s.score.total ? s.score.correct / s.score.total : 0);
@@ -33,6 +33,7 @@ export function historyScreen(state, actions) {
     el("h1", {}, "Your history"),
     sessions.length
       ? el("section", {}, [
+          storageBar(),
           el("div", { class: "sort-row" }, [el("label", { htmlFor: "history-sort" }, "Sort by"), sortMenu]),
           el("ul", { class: "history-list" }, sessions.map((s) => historyRow(s, actions))),
         ])
@@ -45,13 +46,27 @@ const formatDate = (iso) => new Date(iso).toLocaleDateString(undefined, { day: "
 const unfinishedTag = (s) =>
   !s.finished && el("span", { class: "unfinished-tag" }, `Unfinished · ${s.chunksDone} of ${s.chunkCount} chunks`);
 
-// Continue / Start over for an unfinished session whose document is still saved.
+// How much of the browser's roughly 5 MB the saved documents take.
+function storageBar() {
+  const used = savedDocumentsSize();
+  const share = Math.min(100, (used / STORAGE_LIMIT) * 100);
+  return el("div", { class: "storage" }, [
+    el("p", { class: "soft small" }, `Saved documents: ${used ? formatSize(used) : "none"} of about 5 MB`),
+    el("div", { class: "progress-bar storage-bar", role: "img", "aria-label": `${Math.round(share)}% of storage used` },
+      el("div", { style: `width: ${share}%` })),
+  ]);
+}
+
+// Continue / Start over for an unfinished session whose document is still saved,
+// plus its size and a way to remove it to free space.
 function resumeButtons(s, actions) {
   if (s.finished) return false;
   if (!loadDocument(s.id)) return el("p", { class: "soft small resume-row" }, "Document not saved");
   return el("div", { class: "resume-row" }, [
     el("button", { class: "button small-button", onClick: () => actions.resumeSession(s.id) }, "Continue"),
     el("button", { class: "button secondary small-button", onClick: () => actions.restartSession(s.id) }, "Start over"),
+    el("button", { class: "link-button", onClick: () => actions.removeSavedDocument(s.id, s.name) }, "Remove saved document"),
+    el("span", { class: "soft small doc-size" }, formatSize(documentSize(s.id))),
   ]);
 }
 

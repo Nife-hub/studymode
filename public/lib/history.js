@@ -53,6 +53,40 @@ export function removeDocument(id) {
   } catch {}
 }
 
+// Browsers give each site about 5 MB here. They don't report the exact limit,
+// so this is an estimate: browsers store 2 bytes per character.
+export const STORAGE_LIMIT = 5 * 1024 * 1024;
+
+function keySize(key) {
+  try {
+    return (key.length + (localStorage.getItem(key)?.length ?? 0)) * 2;
+  } catch {
+    return 0;
+  }
+}
+
+export const documentSize = (id) => (loadDocument(id) ? keySize(docKey(id)) : 0);
+
+// Space taken by all saved documents together.
+export function savedDocumentsSize() {
+  try {
+    let total = 0;
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith("studymode-doc-")) total += keySize(key);
+    }
+    return total;
+  } catch {
+    return 0;
+  }
+}
+
+// 1234567 → "1.2 MB", 45000 → "44 KB"
+export function formatSize(bytes) {
+  if (bytes >= 100 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
 // A name for pasted text with no name given: its first few words.
 export function nameFromText(text, words = 6) {
   const all = text.trim().split(/\s+/);

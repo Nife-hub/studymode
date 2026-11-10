@@ -663,6 +663,32 @@ mark {
   padding: 18px 22px;
 }
 
+/* Storage bar on the History screen, and the calm "storage is full" note */
+.storage { margin-bottom: 18px; }
+.storage .small { margin: 0 0 6px; }
+.storage-bar { margin-bottom: 0; }
+
+.notice {
+  padding: 12px 16px;
+  border-radius: var(--radius-small);
+  background: var(--accent);
+  color: var(--text);
+}
+
+.link-button {
+  border: none;
+  background: none;
+  padding: 4px 2px;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-button:hover { color: var(--primary); }
+.doc-size { margin: 0 0 0 auto; }
+
 /* Continue / Start over sit on their own line under an unfinished entry */
 .resume-row {
   flex-basis: 100%;

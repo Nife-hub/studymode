@@ -15,6 +15,9 @@ export function studyScreen(state, actions) {
     el("button", { class: "button secondary back-button", onClick: actions.leaveStudy }, "← Home"),
     el("p", { class: "progress" }, `Chunk ${chunkNumber} of ${total} · ${STEP_LABELS[state.step]}`),
     el("div", { class: "progress-bar" }, el("div", { style: `width: ${(chunkNumber / total) * 100}%` })),
+    state.storageFull &&
+      el("p", { class: "notice", role: "status" },
+        "Storage is full, so this document can't be saved for later. Remove some saved documents in History to make space."),
     steps[state.step](state, actions),
   ]);
 }
