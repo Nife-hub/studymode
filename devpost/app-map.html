@@ -50,12 +50,24 @@
 <body>
 <main>
   <h1>StudyMode: App Map</h1>
-  <p class="soft">A one-page guide to how your app fits together and where to make changes. It's a snapshot of the code after round 2 (score history and resume, November 2026), so it may drift as the code changes.</p>
+  <p class="soft">A one-page guide to how your app fits together and where to make changes. It's a snapshot of the code after round 3 (Word documents, web articles and the picture-card Home Page, November 2026), so it may drift as the code changes.</p>
 
   <section aria-labelledby="what">
     <h2 id="what">What it is, in two parts</h2>
     <p><strong>The page you see</strong> (<code>public/</code>) is plain HTML, CSS and JavaScript. It reads your PDF in the browser, cuts the text into chunks of about 600–800 words, and shows the screens. Everything you're doing right now lives in one object called <code>state</code> in <code>public/app.js</code>. Each change to <code>state</code> goes through a small <em>action</em> function and then redraws the page with <code>render()</code>.</p>
     <p><strong>The helper server</strong> (<code>server/</code>) hands the page to your browser and keeps your Claude API key private. For each chunk you study, it asks Claude for key points, 10 flashcards and a 5-question quiz.</p>
+  </section>
+
+  <section aria-labelledby="inputs">
+    <h2 id="inputs">Four ways in (round 3)</h2>
+    <p>The Home Page cards are drawn in <code>public/components/inputCards.js</code> (the <code>PICTURES</code> drawings and the <code>INPUT_KINDS</code> list). Picking one calls <code>pickInput</code>, and <code>public/screens/home.js</code> shows only that card's input. Each way ends up in the same <code>startStudying</code> action in <code>public/app.js</code>:</p>
+    <ul>
+      <li><strong>PDF</strong>: <code>public/lib/readPdf.js</code> (PDF.js, in your browser).</li>
+      <li><strong>Word</strong>: <code>public/lib/readDocx.js</code> (mammoth, in your browser; <code>.docx</code> only).</li>
+      <li><strong>Web article</strong>: <code>public/lib/readArticle.js</code> asks the helper's <code>/api/article</code>, and <code>server/article.js</code> fetches the page safely and pulls out the article with Readability.</li>
+      <li><strong>Paste text</strong>: straight to <code>startStudying</code>.</li>
+    </ul>
+    <p>Each session remembers where it came from (<code>source</code>), shown as a PDF / Word / Text / Link tag in History.</p>
   </section>
 
   <section aria-labelledby="saved">
@@ -124,6 +136,8 @@
         <tr><td>What Claude writes, and its tone</td><td><code>SYSTEM_PROMPT</code> in <code>server/studyRound.js</code></td></tr>
         <tr><td>How long a chunk is</td><td><code>TARGET</code> and <code>MAX</code> in <code>public/lib/chunkText.js</code></td></tr>
         <tr><td>Which Claude model (cost vs quality)</td><td><code>model:</code> in <code>server/studyRound.js</code></td></tr>
+        <tr><td>The picture cards' drawings or wording</td><td><code>PICTURES</code> and <code>INPUT_KINDS</code> in <code>public/components/inputCards.js</code>; card colors are the <code>--pic-*</code> variables in <code>public/styles.css</code></td></tr>
+        <tr><td>What counts as a readable article (time limit, size, minimum words)</td><td>The constants at the top of <code>server/article.js</code></td></tr>
         <tr><td>History sort options</td><td><code>SORTS</code> in <code>public/screens/history.js</code></td></tr>
         <tr><td>The "about 5 MB" storage estimate</td><td><code>STORAGE_LIMIT</code> in <code>public/lib/history.js</code></td></tr>
         <tr><td>The "Storage is full" wording</td><td><code>public/screens/study.js</code></td></tr>

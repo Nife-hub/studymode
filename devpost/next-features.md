@@ -133,9 +133,10 @@ Build mode: fast. Each step leaves the app working and gets its own commit.
 Afterwards: your final try of round 3, an app-map update, and pushing to GitHub.
 
 ## Where We Left Off
-Paused on 2026-11-02 ("ill continue later").
-- Steps 1 and 2 are done and checked by the learner.
-- Step 3 is built and committed: chunks open one at a time, and questions can be answered again for revision. **Still to do:** the learner's check of Step 3 (open a chunk, practise a wrong question, try it in dark mode). Sessions saved before this change only have the question text, so their questions can't be practised.
-- Next: after that check, mark Step 3 done and start Step 4 (Continue and Start over from History).
-
-Update on 2026-11-10: a session on another computer copy, unaware of the work above, re-planned and rebuilt Step 1. The learner chose to keep this version, so that rebuild was reverted and these decisions stand (resume from History; Start over makes a new session). Fixed a Step 3 bug where "false" showed as text under a practised question. `.env` is now read by `server/loadEnv.js`. The learner checked Step 3 ("it works"). Step 4 is built and verified in a simulated browser; Start over keeps the old entry's text until the new session's first chunk is saved, so it's never lost in between. The learner checked Step 4 ("it works"). Step 5 is built and verified in a simulated browser with a small storage limit (bar up and down, full-storage note, score kept, text saved again once space is freed). The learner checked Step 5 and tried all of round 2 ("it works"). `devpost/app-map.html` now covers history and resume. Round 2 is complete and pushed to GitHub.
+Paused on 2026-11-10 ("ill continue later").
+- **Round 2 (score history, resume, storage):** complete, checked by the learner, pushed.
+- **Round 3 (Word documents, web articles, picture-card Home Page):** R3-1 and R3-2 are built, verified in a simulated browser (64 checks) and against real links, and committed. History type tags and the one-row card layout were added at the learner's request. The learner confirmed the redesign works; a login-only page was tested by the agent (GitHub settings page → friendly message) because the learner had none to try. `devpost/app-map.html` covers round 3. Pushed to GitHub.
+- **Still open from the round 3 check:** the learner trying a real news or blog article they'd study, and the History tags on new sessions.
+- **Maybe later:** improving the card drawings (the learner found them "okay").
+- **Remaining ideas** (`scope.md > Later`): user accounts with saved progress, and opening StudyMode up publicly (plan these together; they share server and cost questions).
+- **Before starting next time:** `git pull` first. Copy `.env.example` to `.env` with the API key on any new computer.
