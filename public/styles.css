@@ -400,7 +400,7 @@ input[type="url"]:focus {
 .input-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+  gap: 24px;
 }
 
 @media (max-width: 640px) {
@@ -456,19 +456,23 @@ input[type="url"]:focus {
 
 .input-hint { font-size: 0.85rem; }
 
-.pic-paper { fill: var(--surface); stroke: var(--primary); stroke-width: 2; stroke-linejoin: round; }
-.pic-fold, .pic-line, .pic-globe-line, .pic-pencil { fill: none; stroke: var(--primary); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.pic-line { stroke: var(--text-soft); opacity: 0.6; }
-.pic-badge.pdf { fill: var(--pic-pdf); }
-.pic-badge.docx { fill: var(--pic-docx); }
-.pic-badge-text { fill: var(--pic-badge-text); font: 700 12px var(--font-heading); }
-.pic-badge-text.big { font-size: 20px; }
-.pic-dot { fill: var(--text-soft); opacity: 0.6; }
-.pic-globe { fill: var(--pic-web); fill-opacity: 0.2; stroke: var(--pic-web); stroke-width: 2; }
-.web .pic-globe-line { stroke: var(--pic-web); }
+.pic-line { fill: none; stroke: var(--text-soft); stroke-width: 2; stroke-linecap: round; opacity: 0.6; }
 .pic-clip { fill: var(--accent); stroke: var(--primary); stroke-width: 2; }
 .pic-highlight { fill: var(--highlight); }
-.pic-pencil { fill: var(--highlight); }
+.pic-file.pdf { fill: var(--pic-pdf); }
+.pic-tile.docx { fill: var(--pic-docx); }
+.pic-file-fold.pdf { fill: var(--surface); opacity: 0.45; }
+.pic-tag { fill: var(--surface); }
+.pic-tag-text { font: 700 15px var(--font-heading); letter-spacing: 0.5px; }
+.pic-tag-text.pdf { fill: var(--pic-pdf); }
+.pic-page { fill: var(--surface); stroke: var(--pic-docx); stroke-width: 2; }
+.pic-page-line { fill: none; stroke: var(--pic-docx); stroke-width: 2.5; stroke-linecap: round; opacity: 0.7; }
+.pic-tile-text { fill: var(--pic-badge-text); font: 700 30px var(--font-heading); }
+.pic-globe-fill { fill: var(--pic-web); }
+.pic-globe-grid { fill: none; stroke: var(--surface); stroke-width: 2; opacity: 0.75; }
+.pic-chain rect { fill: none; stroke: var(--primary); stroke-width: 4; }
+.pic-board { fill: var(--primary); }
+.pic-board-paper { fill: var(--surface); }
 
 @keyframes wiggle {
   0%, 100% { transform: rotate(0); }

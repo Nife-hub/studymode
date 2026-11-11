@@ -4,38 +4,40 @@
 import { el } from "../lib/dom.js";
 
 const PICTURES = {
+  // A solid red PDF file, the way file icons show PDFs everywhere.
   pdf: `
     <svg viewBox="0 0 120 90" aria-hidden="true">
-      <path class="pic-paper" d="M38 8 H72 L86 22 V82 H38 Z" />
-      <path class="pic-fold" d="M72 8 V22 H86" />
-      <path class="pic-line" d="M46 34 H78 M46 42 H78 M46 50 H70 M46 58 H76 M46 66 H64" />
-      <rect class="pic-badge pdf" x="22" y="52" width="40" height="22" rx="7" />
-      <text class="pic-badge-text" x="42" y="67.5" text-anchor="middle">PDF</text>
+      <path class="pic-file pdf" d="M36 6 H70 L88 24 V80 Q88 86 82 86 H42 Q36 86 36 80 Z" />
+      <path class="pic-file-fold pdf" d="M70 6 V20 Q70 24 74 24 H88 Z" />
+      <rect class="pic-tag" x="28" y="48" width="52" height="22" rx="6" />
+      <text class="pic-tag-text pdf" x="54" y="64.5" text-anchor="middle">PDF</text>
     </svg>`,
+  // A blue Word tile with a big W, and the document's pages peeking out behind it.
   docx: `
     <svg viewBox="0 0 120 90" aria-hidden="true">
-      <path class="pic-paper" d="M42 8 H76 L90 22 V82 H42 Z" />
-      <path class="pic-fold" d="M76 8 V22 H90" />
-      <path class="pic-line" d="M50 34 H82 M50 42 H82 M50 50 H76 M50 58 H82 M50 66 H70" />
-      <rect class="pic-badge docx" x="22" y="26" width="32" height="32" rx="8" />
-      <text class="pic-badge-text big" x="38" y="49" text-anchor="middle">W</text>
+      <rect class="pic-page" x="52" y="12" width="44" height="66" rx="6" />
+      <path class="pic-page-line" d="M66 28 H88 M66 38 H88 M66 48 H88 M66 58 H88 M66 68 H82" />
+      <rect class="pic-tile docx" x="24" y="22" width="46" height="46" rx="10" />
+      <text class="pic-tile-text" x="47" y="54" text-anchor="middle">W</text>
     </svg>`,
+  // A globe with a link chain: a page somewhere on the web.
   web: `
     <svg viewBox="0 0 120 90" aria-hidden="true">
-      <rect class="pic-paper" x="14" y="12" width="92" height="66" rx="8" />
-      <path class="pic-fold" d="M14 26 H106" />
-      <circle class="pic-dot" cx="23" cy="19" r="2.5" /><circle class="pic-dot" cx="31" cy="19" r="2.5" /><circle class="pic-dot" cx="39" cy="19" r="2.5" />
-      <circle class="pic-globe" cx="40" cy="52" r="15" />
-      <path class="pic-globe-line" d="M25 52 H55 M40 37 C32 45 32 59 40 67 M40 37 C48 45 48 59 40 67" />
-      <path class="pic-line" d="M64 40 H96 M64 48 H96 M64 56 H88 M64 64 H92" />
+      <circle class="pic-globe-fill" cx="54" cy="44" r="32" />
+      <path class="pic-globe-grid" d="M22 44 H86 M27 28 H81 M27 60 H81 M54 12 C38 26 38 62 54 76 M54 12 C70 26 70 62 54 76 M54 12 V76" />
+      <g class="pic-chain">
+        <rect x="70" y="58" width="22" height="13" rx="6.5" transform="rotate(-35 81 64.5)" />
+        <rect x="82" y="50" width="22" height="13" rx="6.5" transform="rotate(-35 93 56.5)" />
+      </g>
     </svg>`,
+  // A clipboard with notes on it: the usual sign for pasting.
   paste: `
     <svg viewBox="0 0 120 90" aria-hidden="true">
-      <rect class="pic-paper" x="34" y="14" width="52" height="68" rx="8" />
-      <rect class="pic-clip" x="48" y="8" width="24" height="12" rx="4" />
-      <rect class="pic-highlight" x="42" y="31" width="30" height="8" rx="3" />
-      <path class="pic-line" d="M42 35 H78 M42 46 H78 M42 56 H72 M42 66 H76" />
-      <path class="pic-pencil" d="M78 74 L84 62 L100 46 L106 52 L90 68 Z M84 62 L90 68" />
+      <rect class="pic-board" x="32" y="10" width="56" height="76" rx="8" />
+      <rect class="pic-board-paper" x="39" y="20" width="42" height="58" rx="4" />
+      <rect class="pic-clip" x="48" y="5" width="24" height="12" rx="4" />
+      <rect class="pic-highlight" x="44" y="30" width="26" height="7" rx="3" />
+      <path class="pic-line" d="M45 33.5 H75 M45 45 H75 M45 55 H70 M45 65 H73" />
     </svg>`,
 };
 

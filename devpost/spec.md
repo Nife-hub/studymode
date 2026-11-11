@@ -100,7 +100,7 @@ Implements `prd.md > Look and Feel`. The learner chose dark blues and a clean fo
 - **Layout:** one centered column about 680px wide, with lots of white space. One thing on screen at a time: Summary, Flashcards, and Quiz are separate steps. A rounded progress bar sits at the top of the Study Screen ("Chunk 2 of 7 · Quiz").
 - **Friendly details:** rounder cards (20px corners) with soft shadows, pill-shaped buttons, emoji icons on the how-to steps, and a gently bobbing 📚 on the Opening Page. The upload section has a stronger shadow so it stands out as the main thing to do.
 - **Flashcards:** soft rounded cards with a quiet flip animation of about 0.4s (done in CSS). Front and back are labeled.
-- **Copy tone:** short, casual, and encouraging. The Opening tagline is "Big reading, bite-sized wins."; the Home headline is "Turn that never-ending PDF into quick, easy wins."
+- **Copy tone:** short, casual, and encouraging. The Opening tagline is "Big reading, bite-sized wins."; the Home headline is "Turn that never-ending reading into quick, easy wins."
 - **Motion:** minimal, with gentle fades and a slow spinning loading ring. All animation is switched off when the computer's "reduce motion" setting is on.
 
 ## Components

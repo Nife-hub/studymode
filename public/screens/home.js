@@ -89,7 +89,7 @@ function pickedInput(state, actions) {
 export function homeScreen(state, actions) {
   return el("main", { class: "screen" }, [
     el("section", { class: "hero" }, [
-      el("h1", {}, "Turn that never-ending PDF into quick, easy wins."),
+      el("h1", {}, "Turn that never-ending reading into quick, easy wins."),
       el("p", { class: "soft" }, "Bite-sized chunks, flashcards and mini quizzes, so you actually make it to the last page."),
       el("button", { class: "button secondary", onClick: () => actions.goTo("history") }, "📊 Your history"),
     ]),

@@ -137,6 +137,6 @@ Paused on 2026-11-10 ("ill continue later"). Round 3 checks finished on 2026-11-
 - **Round 2 (score history, resume, storage):** complete, checked by the learner, pushed.
 - **Round 3 is complete.** On 2026-11-11 the learner studied a real article from a link ("the article worked") and confirmed the History tags appear on new sessions.
 - **Round 3 (Word documents, web articles, picture-card Home Page):** R3-1 and R3-2 are built, verified in a simulated browser (64 checks) and against real links, and committed. History type tags and the one-row card layout were added at the learner's request. The learner confirmed the redesign works; a login-only page was tested by the agent (GitHub settings page → friendly message) because the learner had none to try. `devpost/app-map.html` covers round 3. Pushed to GitHub.
-- **Maybe later:** improving the card drawings (the learner found them "okay").
+- **Card drawings improved (2026-11-11):** at the learner's request, each card now shows the icon people know for it (red PDF file, blue W tile, globe with a link, clipboard). The headline became "Turn that never-ending reading into quick, easy wins." and the cards got more space between them.
 - **Remaining ideas** (`scope.md > Later`): user accounts with saved progress, and opening StudyMode up publicly (plan these together; they share server and cost questions).
 - **Before starting next time:** `git pull` first. Copy `.env.example` to `.env` with the API key on any new computer.
