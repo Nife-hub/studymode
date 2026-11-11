@@ -12,6 +12,9 @@ import { studyScreen } from "./screens/study.js";
 import { finishedScreen } from "./screens/finished.js";
 import { historyScreen, SORTS } from "./screens/history.js";
 import { loadingView } from "./components/loading.js";
+import { loginScreen } from "./screens/login.js";
+import { accountButton } from "./components/accountButton.js";
+import { setUpAuth, signInWithGoogle, signUp, logIn, sendPasswordReset, setNewPassword, logOut } from "./lib/auth.js";
 
 const SORT_KEY = "studymode-history-sort";
 
@@ -46,6 +49,10 @@ const freshState = () => ({
   inputKind: null, // the Home Page card picked: "pdf", "docx", "web" or "paste"
   offerPaste: false, // a link couldn't be read, so the error offers "Paste text instead"
   source: "paste", // where this session's text came from: "pdf", "docx", "paste" or "web"
+  loginMode: "login", // the sign-in screen's form: "login", "signup", "forgot" or "newPassword"
+  returnTo: "home", // the screen to go back to after signing in
+  authBusy: false,
+  authMessage: null, // e.g. "We sent a link to your email"
   error: null,
 });
 
@@ -58,6 +65,7 @@ const screens = {
   study: studyScreen,
   finished: finishedScreen,
   history: historyScreen,
+  login: loginScreen,
 };
 
 let lastView = "";
@@ -65,6 +73,7 @@ let lastView = "";
 function render() {
   const app = document.getElementById("app");
   app.replaceChildren(screens[state.screen](state, actions));
+  document.getElementById("account")?.replaceChildren(...[].concat(accountButton(state, actions)));
   // Jump to the top only when moving to a new screen or step, not on every small change.
   const view = `${state.screen}/${state.step}/${state.chunkIndex}`;
   if (view !== lastView) window.scrollTo(0, 0);
@@ -315,11 +324,82 @@ const actions = {
     actions.startOver();
   },
 
+  // Accounts. Signing in never interrupts studying: the sign-in screen
+  // returns to wherever the learner was.
+  openLogin() {
+    update({ screen: "login", loginMode: "login", returnTo: state.screen, error: null, authMessage: null });
+  },
+
+  closeLogin() {
+    update({ screen: state.returnTo, error: null, authMessage: null, authBusy: false });
+  },
+
+  setLoginMode(loginMode) {
+    update({ loginMode, error: null, authMessage: null });
+  },
+
+  async continueWithGoogle() {
+    update({ authBusy: true, error: null, authMessage: null });
+    try {
+      await signInWithGoogle(); // leaves for Google's page, then comes back signed in
+    } catch (err) {
+      update({ authBusy: false, error: err.message });
+    }
+  },
+
+  async submitLogin(mode, form) {
+    update({ authBusy: true, error: null, authMessage: null });
+    const email = (form.email ?? "").trim();
+    try {
+      if (mode === "login") {
+        await logIn(email, form.password);
+        update({ screen: state.returnTo, authBusy: false });
+      } else if (mode === "signup") {
+        const ready = await signUp((form.name ?? "").trim(), email, form.password);
+        if (ready) update({ screen: state.returnTo, authBusy: false });
+        else update({ authBusy: false, authMessage: `Almost there! We sent a link to ${email}. Click it to confirm your account, and you'll be signed in.` });
+      } else if (mode === "forgot") {
+        await sendPasswordReset(email);
+        update({ authBusy: false, authMessage: `If there's an account for ${email}, a link to pick a new password is on its way.` });
+      } else if (mode === "newPassword") {
+        await setNewPassword(form.password);
+        update({ screen: "home", authBusy: false });
+      }
+    } catch (err) {
+      update({ authBusy: false, error: err.message });
+    }
+  },
+
+  async logOut() {
+    try {
+      await logOut();
+    } catch {}
+    render();
+  },
+
   startOver() {
     state = { ...freshState(), screen: "home" };
     render();
   },
 };
 
+// Coming back from Google, a confirm-email link or a reset-password link:
+// skip the Opening Page. A link that's expired or already used says so.
+const fromLink = /access_token|error_description|[?&]code=/.test(window.location.hash + window.location.search);
+if (fromLink) {
+  state = { ...state, screen: "home" };
+  if (/error_description/.test(window.location.hash + window.location.search)) {
+    state = { ...state, screen: "login", returnTo: "home", error: "That link has expired or was already used. Try again." };
+    history.replaceState(null, "", window.location.pathname);
+  }
+}
+
 render();
 setUpThemeToggle();
+setUpAuth((event) => {
+  if (event === "PASSWORD_RECOVERY") {
+    update({ screen: "login", loginMode: "newPassword", returnTo: "home", error: null, authMessage: null });
+  } else {
+    render(); // redraw the account button
+  }
+});

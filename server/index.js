@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { makeStudyRound } from "./studyRound.js";
 import { readArticle, ArticleError, CANT_READ } from "./article.js";
+import { accountsOn, publicConfig, whoIsAsking } from "./auth.js";
 
 const PORT = Number(process.env.PORT) || 3000;
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -22,7 +23,15 @@ app.get("/vendor/mammoth/mammoth.browser.min.js", (req, res) => {
   res.type("text/javascript").sendFile(path.join(root, "node_modules/mammoth/mammoth.browser.min.js"));
 });
 
-// 4. One chunk in, one study round out.
+// 4. Supabase's browser library, for signing in.
+app.get("/vendor/supabase/supabase.js", (req, res) => {
+  res.type("text/javascript").sendFile(path.join(root, "node_modules/@supabase/supabase-js/dist/umd/supabase.js"));
+});
+
+// 5. What the page needs to talk to Supabase (empty when accounts are off).
+app.get("/api/config", (req, res) => res.json(publicConfig()));
+
+// 6. One chunk in, one study round out.
 app.post("/api/study-round", async (req, res) => {
   const { chunkText, chunkNumber = 1, totalChunks = 1 } = req.body ?? {};
   if (typeof chunkText !== "string" || !chunkText.trim()) {
@@ -33,7 +42,8 @@ app.post("/api/study-round", async (req, res) => {
     return res.status(500).json({ error: FRIENDLY_ERROR });
   }
 
-  console.log(`Preparing chunk ${chunkNumber} of ${totalChunks}…`);
+  const person = await whoIsAsking(req);
+  console.log(`Preparing chunk ${chunkNumber} of ${totalChunks} (${person ? "signed in" : "guest"})…`);
   try {
     const round = await makeStudyRound({ chunkText, chunkNumber, totalChunks });
     console.log(`Chunk ${chunkNumber} ready.`);
@@ -44,7 +54,7 @@ app.post("/api/study-round", async (req, res) => {
   }
 });
 
-// 5. A link in, the article's title and text out.
+// 7. A link in, the article's title and text out.
 app.post("/api/article", async (req, res) => {
   const link = req.body?.url;
   console.log(`Reading article: ${String(link).slice(0, 200)}`);
@@ -63,4 +73,5 @@ app.listen(PORT, () => {
   if (!process.env.ANTHROPIC_API_KEY) {
     console.warn("  Note: no ANTHROPIC_API_KEY yet. Copy .env.example to .env and paste your key.");
   }
+  console.log(accountsOn ? "  Accounts are on (Supabase)." : "  Accounts are off: no SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY in .env.");
 });

@@ -132,11 +132,81 @@ Build mode: fast. Each step leaves the app working and gets its own commit.
 
 Afterwards: your final try of round 3, an app-map update, and pushing to GitHub.
 
+## Feature 4: Accounts and Opening StudyMode Up (round 4, planning)
+*Started 2026-11-11. From `scope.md > Later` (user accounts; opening it up for other people).*
+
+### Why
+- **Other people can use StudyMode.** Friends and other students sign up, and each gets their own private history. *Learner's choice.* That means putting StudyMode online, so accounts and going public are planned together.
+
+### Who pays for the AI
+- **The learner's API key pays, with a free daily limit per account.** *Learner's choice.*
+- **A paid Pro plan:** a monthly payment for "unlimited" studying. *Learner's request.* Behind the scenes it has a high fair-use cap that normal studying never reaches, so one heavy user can't run up a huge bill. *Agent suggestion, accepted by the learner.*
+
+### Order
+- **Round 4:** put StudyMode online, add sign-up and log-in, and set the free daily limit.
+- **Round 5:** the Pro plan with monthly payments. *Agent suggestion, accepted by the learner.*
+
+### Signing in
+- **Continue with Google**, or **email and password** (with a "Forgot password" email). *Agent recommendation, accepted by the learner.*
+- A **Log in** button in the top bar; once signed in, it shows the person's name with a **Log out** option.
+
+### Guests and the free limit
+- **Guests can study one chunk** without an account, then are asked to sign up to keep going and save their history. *Agent recommendation, accepted by the learner.*
+- **Free accounts get 5 chunks a day.** *Learner's choice.*
+- **When the limit is reached:** a calm message such as "You've done your 5 chunks for today, nice work! More tomorrow." Progress is saved, so they continue later. In round 5 a Pro button joins this message. *Agent recommendation, accepted by the learner.*
+
+### History moves into the account
+- History and saved documents are kept online in the account, so they follow the person to any device.
+- **On first sign-in, history already saved in that browser moves into the account automatically**, so nothing is lost. *Agent recommendation, accepted by the learner.*
+
+### Setup (agent's choice; the learner said "you decide")
+- **Supabase** for sign-in (Google, email and password) and the database. Free plan to start.
+- **Render** to run the existing server online at a web address. Free plan to start; it naps when nobody has visited for a while, so the first visit after that takes about 30 to 60 seconds. The paid plan (about $7 a month) removes the nap.
+- The Claude API key stays on the server only, as now.
+
+### Agent defaults (change any of these)
+- **The daily limit resets at midnight in the person's own time zone.**
+- **Each account gets about 5 MB for saved documents**, the same as now, so the storage bar and "Remove saved document" keep working.
+- **The guest's free chunk is limited per browser and per internet address**, so it can't be repeated endlessly by refreshing.
+- **A short privacy page** says what's stored (email, name, history, saved documents) and that people can delete their account and everything in it. Delete account is in the account menu.
+
+### Round 4 build steps
+Build mode: fast. Each step leaves the app working and gets its own commit.
+
+- [ ] **R4-1. Sign up and log in**
+  Becomes usable: A **Log in** button opens a sign-in screen with **Continue with Google** and email and password (with "Forgot password"). Once signed in, the top bar shows the person's name and **Log out**. Nothing else changes yet.
+  Learner setup (with step-by-step help): make a free Supabase project, and set up Google sign-in in Google Cloud. Keys go in `.env`, never in chat.
+  Build: Serve Supabase's browser library at `/vendor/supabase/` (like PDF.js). Write `public/lib/auth.js` and `public/screens/login.js`, add the top-bar account button, and have the server check the signed-in person on each request. Update `spec.md`.
+  Verify: Sign up with email, log out and back in; sign in with Google; a wrong password and an unconfirmed email show friendly messages.
+  Commit: `Add sign-up and log-in`
+
+- [ ] **R4-2. History saved to the account**
+  Becomes usable: Signed-in history and saved documents live in the account, so they show up on any device. On first sign-in, the browser's existing history moves in automatically. The storage bar counts the account's 5 MB.
+  Build: Supabase tables for sessions and saved documents, each locked so people only ever see their own rows. Switch `history.js` to read and write the account when signed in, and add the one-time move from the browser. Add Delete account and the privacy page.
+  Verify: Study on one browser and see the session in another browser after signing in. Old browser history appears in the account once, not twice. One account can't see another's history.
+  Commit: `Save history to the account`
+
+- [ ] **R4-3. Daily limit and the guest chunk**
+  Becomes usable: Free accounts get 5 chunks a day, then the friendly "More tomorrow" message. Guests can study one chunk, then are asked to sign up.
+  Build: A usage table counted on the server before each Claude request (so it can't be skipped from the browser), reset at the person's local midnight. Guest count by browser and internet address.
+  Verify: The 6th chunk of the day shows the message and makes no Claude request. A guest's 2nd chunk asks them to sign up. Tomorrow's count starts again from 0.
+  Commit: `Add the free daily limit`
+
+- [ ] **R4-4. Put StudyMode online**
+  Becomes usable: StudyMode runs on Render at a public web address that friends can visit and sign up on.
+  Learner setup (with step-by-step help): make a free Render account and connect the GitHub repository.
+  Build: Settings for Render (start command, keys stored in Render, not in the code), Supabase and Google sign-in pointed at the new address.
+  Verify: Open the address on a phone, sign up, study a chunk, and see the session in History on the laptop.
+  Commit: `Put StudyMode online`
+
 ## Where We Left Off
-Paused on 2026-11-10 ("ill continue later"). Round 3 checks finished on 2026-11-11.
-- **Round 2 (score history, resume, storage):** complete, checked by the learner, pushed.
-- **Round 3 is complete.** On 2026-11-11 the learner studied a real article from a link ("the article worked") and confirmed the History tags appear on new sessions.
-- **Round 3 (Word documents, web articles, picture-card Home Page):** R3-1 and R3-2 are built, verified in a simulated browser (64 checks) and against real links, and committed. History type tags and the one-row card layout were added at the learner's request. The learner confirmed the redesign works; a login-only page was tested by the agent (GitHub settings page → friendly message) because the learner had none to try. `devpost/app-map.html` covers round 3. Pushed to GitHub.
-- **Card drawings improved (2026-11-11):** at the learner's request, each card now shows the icon people know for it (red PDF file, blue W tile, globe with a link, clipboard). The headline became "Turn that never-ending reading into quick, easy wins." and the cards got more space between them.
-- **Remaining ideas** (`scope.md > Later`): user accounts with saved progress, and opening StudyMode up publicly (plan these together; they share server and cost questions).
-- **Before starting next time:** `git pull` first. Copy `.env.example` to `.env` with the API key on any new computer.
+Paused on 2026-11-11 ("ill do this later").
+- **Rounds 2 and 3:** complete, checked by the learner, pushed. The cards now have familiar icons, and the headline says "reading".
+- **Round 4 (accounts):** planned and approved, fast mode. **R4-1 code is written and committed but not yet ticked.** That covers the sign-in screen, the top-right Log in button, `server/auth.js`, `public/lib/auth.js`, `public/screens/login.js` and `public/components/accountButton.js`. It was tested in a headless browser against a placeholder Supabase address. Accounts stay off until `.env` has Supabase settings, so the app works as before.
+- **To do first when resuming (ask the learner to do these):**
+  1. Create the Supabase project: supabase.com → New project named `StudyMode`, a region nearby, and a database password kept in a password manager (never in chat).
+  2. Copy the **Project URL** and the **publishable key** (`sb_publishable_…`, not the secret key) from Project Settings → API Keys into `.env` as `SUPABASE_URL=` and `SUPABASE_PUBLISHABLE_KEY=`, not in chat.
+  3. Authentication → URL Configuration: Site URL `http://localhost:3000`, and add the Redirect URL `http://localhost:3000/**`.
+  Then restart the server and verify R4-1 for real: sign up with email, confirm, log out and back in, and check that a wrong password shows the friendly message. After that, set up Google sign-in (Google Cloud OAuth client → Supabase Authentication → Providers → Google) and test it. Then commit, tick R4-1, and move on to R4-2.
+- **Remaining ideas** (`scope.md > Later`): round 5, the Pro plan with monthly payments.
+- **Before starting next time:** `git pull` first. Copy `.env.example` to `.env` with the API keys on any new computer.
