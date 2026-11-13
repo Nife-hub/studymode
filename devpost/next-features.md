@@ -173,7 +173,7 @@ Afterwards: your final try of round 3, an app-map update, and pushing to GitHub.
 ### Round 4 build steps
 Build mode: fast. Each step leaves the app working and gets its own commit.
 
-- [ ] **R4-1. Sign up and log in**
+- [x] **R4-1. Sign up and log in**
   Becomes usable: A **Log in** button opens a sign-in screen with **Continue with Google** and email and password (with "Forgot password"). Once signed in, the top bar shows the person's name and **Log out**. Nothing else changes yet.
   Learner setup (with step-by-step help): make a free Supabase project, and set up Google sign-in in Google Cloud. Keys go in `.env`, never in chat.
   Build: Serve Supabase's browser library at `/vendor/supabase/` (like PDF.js). Write `public/lib/auth.js` and `public/screens/login.js`, add the top-bar account button, and have the server check the signed-in person on each request. Update `spec.md`.
@@ -200,14 +200,11 @@ Build mode: fast. Each step leaves the app working and gets its own commit.
   Commit: `Put StudyMode online`
 
 ## Where We Left Off
-Paused on 2026-11-11 ("ill do this later").
-- **Rounds 2 and 3:** complete, checked by the learner, pushed. The cards now have familiar icons, and the headline says "reading".
-- **Round 4 (accounts):** planned and approved, fast mode. **R4-1 is almost done, not yet ticked.** The code is committed (`server/auth.js`, `public/lib/auth.js`, `public/screens/login.js`, `public/components/accountButton.js`).
-- **Done on 2026-11-12:** the Supabase project `StudyMode` exists, its URL and publishable key are in `.env`, and the URL Configuration is set for `http://localhost:3000`. The server starts with "Accounts are on (Supabase)". The learner signed up with email, confirmed, and logged in for real ("it works"). A wrong password returns Supabase's `invalid_credentials` code, which the app turns into its friendly message. Email confirmation is required (on).
-- **To do first when resuming: Google sign-in (ask the learner to do these):**
-  1. Supabase → Authentication → Sign In / Providers → Google: switch it on and copy the **Callback URL** shown there. It is always shown in that panel, and it is simply the `SUPABASE_URL` from `.env` followed by `/auth/v1/callback`.
-  2. Google Cloud (console.cloud.google.com): new project `StudyMode` → OAuth consent screen / Google Auth Platform → Get started (app name StudyMode, External) → Clients → Create client → Web application. Authorized JavaScript origin `http://localhost:3000`; Authorized redirect URI = the Callback URL.
-  3. Paste the Client ID and Client secret into Supabase's Google panel and Save (never in chat).
-  Then test **Continue with Google**, tick R4-1, and move on to R4-2.
+Last session: 2026-11-13.
+- **Rounds 2 and 3:** complete, checked by the learner, pushed.
+- **Round 4 (accounts):** fast mode. **R4-1 is done and ticked.** Email sign-in and **Continue with Google** both work for real against the Supabase project `StudyMode` (checked by the learner on 2026-11-12 and 2026-11-13).
+- **Google sign-in setup (done 2026-11-13):** Google Cloud project `studymode`, under the learner's own organization rather than "No organization". Google Auth Platform branding is set up (app name StudyMode). One **Web application** OAuth client has origin `http://localhost:3000` and redirect URI = Supabase's `/auth/v1/callback`. "Use this client for an AI-powered agent" is left unticked. The Client ID and secret are only in Supabase. While testing, Google may show "hasn't verified this app", which is expected.
+- **For R4-4 (going online):** add the Render address as another Authorized JavaScript origin on that Google client, and as the Site URL / redirect URL in Supabase's URL Configuration.
+- **Next:** R4-2, history saved to the account.
 - **Remaining ideas** (`scope.md > Later`): round 5, the Pro plan with monthly payments.
 - **Before starting next time:** `git pull` first. Copy `.env.example` to `.env` with the API keys on any new computer.
