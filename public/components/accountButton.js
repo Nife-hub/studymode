@@ -1,5 +1,6 @@
 // Top-right account button, next to the light/dark toggle.
-// Signed out: "Log in". Signed in: the person's name, opening a small menu with Log out.
+// Signed out: "Log in". Signed in: the person's name, opening a small menu with
+// Log out, Privacy and Delete account.
 import { el } from "../lib/dom.js";
 import { accountsOn, currentUser, displayName } from "../lib/auth.js";
 
@@ -18,6 +19,8 @@ export function accountButton(state, actions) {
     el("div", { class: "account-dropdown card" }, [
       el("p", { class: "soft account-email" }, person.email),
       el("button", { class: "button secondary small-button", type: "button", onClick: () => actions.logOut() }, "Log out"),
+      el("button", { class: "link-button", type: "button", onClick: () => actions.openPrivacy() }, "Privacy"),
+      el("button", { class: "link-button danger-link", type: "button", onClick: () => actions.deleteMyAccount() }, "Delete account"),
     ]),
   ]);
 }

@@ -219,6 +219,19 @@ Rules: 3–5 `keyPoints`, exactly 10 `flashcards`, exactly 5 `quiz` items, each 
 
 **Saved in the browser (round 2, see `next-features.md`).** `public/lib/history.js` keeps past sessions in localStorage under `studymode-history` (`id`, `name`, `date`, `score`, `results` per chunk, `chunksDone`, `chunkCount`, `finished`, and since round 3 `source`: `pdf`, `docx`, `paste` or `web`, shown as a PDF / Word / Text / Link tag). An unfinished session's chunk texts are kept under `studymode-doc-<id>` so it can be continued, and removed when it's finished, deleted, or removed with **Remove saved document**. The score is saved before the text, so full storage never loses a score; the Study Screen then shows a calm "Storage is full" note, and the text is tried again after the next chunk. The History screen's storage bar estimates use as characters × 2 bytes against about 5 MB. Every read and write is wrapped in try/catch.
 
+**Saved in the account (round 4, R4-2).** When someone is signed in, `history.js` keeps the same session and document data in Supabase instead of localStorage (tables in `supabase/schema.sql`):
+
+| Table | Columns | Notes |
+|---|---|---|
+| `study_sessions` | `user_id`, `id`, `data` (the whole session as JSON), `updated_at` | One row per session |
+| `saved_documents` | `user_id`, `id`, `chunks` (JSON), `size` (bytes, worked out by the database) | Unfinished sessions only |
+
+- **Locked per person:** row level security lets each signed-in person see and change only rows with their own `user_id`. Guests can't read either table.
+- **5 MB per account:** checked by the page before saving, and again by a database trigger (`storage_full`).
+- **No waiting in the page:** at sign-in the account's sessions and document sizes are fetched once into memory. Changes update that copy at once and are sent to Supabase in the background, one at a time and in order. A document's text is fetched only when Continue or Start over needs it. If a write fails, History shows "Some changes couldn't be saved".
+- **Moving in:** on sign-in, sessions and documents saved in that browser are uploaded (an upsert by id, so repeating it never makes duplicates), then cleared from the browser. A document that doesn't fit stays in the browser.
+- **Delete account:** the `delete_my_account()` database function deletes the person from Supabase's users. Their sessions and documents go with them (`on delete cascade`). It is in the account menu and on the privacy page (`public/screens/privacy.js`).
+
 ## File Structure
 
 ```
@@ -238,6 +251,8 @@ studymode/
 │   ├── styles.css        # color variables, font, layout, card flip, feedback colors
 │   ├── app.js            # the state object, actions, and render()
 │   ├── screens/
+│   │   ├── login.js          # sign in: Google, or email and password (round 4)
+│   │   ├── privacy.js        # what's stored, and Delete my account (round 4)
 │   │   ├── opening.js
 │   │   ├── home.js           # hero, steps, upload + paste, error message
 │   │   ├── study.js          # progress line; summary → flashcards → quiz → score
@@ -255,6 +270,8 @@ studymode/
 │       ├── readArticle.js    # calls /api/article
 │       ├── chunkText.js      # text → ~600–800-word chunks
 │       └── api.js            # calls /api/study-round
+├── supabase/
+│   └── schema.sql        # the account tables, their lock, the 5 MB check, delete_my_account (round 4)
 └── devpost/              # Devpost learning workspace (planning docs)
 ```
 

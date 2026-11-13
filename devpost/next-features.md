@@ -200,11 +200,12 @@ Build mode: fast. Each step leaves the app working and gets its own commit.
   Commit: `Put StudyMode online`
 
 ## Where We Left Off
-Last session: 2026-11-13.
+Last session: 2026-11-13 (paused: "i have to go now").
 - **Rounds 2 and 3:** complete, checked by the learner, pushed.
 - **Round 4 (accounts):** fast mode. **R4-1 is done and ticked.** Email sign-in and **Continue with Google** both work for real against the Supabase project `StudyMode` (checked by the learner on 2026-11-12 and 2026-11-13).
 - **Google sign-in setup (done 2026-11-13):** Google Cloud project `studymode`, under the learner's own organization rather than "No organization". Google Auth Platform branding is set up (app name StudyMode). One **Web application** OAuth client has origin `http://localhost:3000` and redirect URI = Supabase's `/auth/v1/callback`. "Use this client for an AI-powered agent" is left unticked. The Client ID and secret are only in Supabase. While testing, Google may show "hasn't verified this app", which is expected.
 - **For R4-4 (going online):** add the Render address as another Authorized JavaScript origin on that Google client, and as the Site URL / redirect URL in Supabase's URL Configuration.
-- **Next:** R4-2, history saved to the account.
+- **R4-2 (history saved to the account): built and committed, not yet ticked.** The learner ran `supabase/schema.sql` in the SQL Editor ("Success"). Guests are refused on both tables and on `delete_my_account` (checked with the publishable key). The learner checked on 2026-11-13: old browser history moved into the account, a new session saved, the same history appeared in a private window, and the privacy page. ("everything worked")
+- **To do first when resuming:** the one check left for R4-2, which proves other people can't see your history. In a private window, sign up with the learner's Gmail address plus `+test` before the `@` (it arrives in the same inbox), confirm, and check History is **empty**. Then **Delete account** on that test account, and log back in with Google to check the real history is untouched. If that passes, tick R4-2 and move on to R4-3.
 - **Remaining ideas** (`scope.md > Later`): round 5, the Pro plan with monthly payments.
 - **Before starting next time:** `git pull` first. Copy `.env.example` to `.env` with the API keys on any new computer.

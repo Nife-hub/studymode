@@ -35,6 +35,8 @@ export async function setUpAuth(onChange) {
 
 export const accountsOn = () => client !== null;
 export const currentUser = () => user;
+// Supabase's client, for reading and writing the signed-in person's own history.
+export const supabaseClient = () => client;
 
 export function displayName(person) {
   const meta = person?.user_metadata ?? {};
@@ -103,4 +105,11 @@ export function setNewPassword(password) {
 
 export function logOut() {
   return run(() => client.auth.signOut());
+}
+
+// Deletes the signed-in person's account and everything in it (see supabase/schema.sql),
+// then signs out on this device.
+export async function deleteAccount() {
+  await run(() => client.rpc("delete_my_account"));
+  await client.auth.signOut({ scope: "local" }).catch(() => {});
 }

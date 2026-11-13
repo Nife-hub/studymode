@@ -92,6 +92,7 @@ export function homeScreen(state, actions) {
       el("h1", {}, "Turn that never-ending reading into quick, easy wins."),
       el("p", { class: "soft" }, "Bite-sized chunks, flashcards and mini quizzes, so you actually make it to the last page."),
       el("button", { class: "button secondary", onClick: () => actions.goTo("history") }, "📊 Your history"),
+      state.authMessage && el("p", { class: "notice", role: "status" }, state.authMessage),
     ]),
     el("section", { class: "steps" }, [
       el("h2", {}, "How it works"),

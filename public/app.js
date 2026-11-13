@@ -5,7 +5,7 @@ import { readPdf } from "./lib/readPdf.js";
 import { readDocx } from "./lib/readDocx.js";
 import { readArticle } from "./lib/readArticle.js";
 import { setUpThemeToggle } from "./lib/theme.js";
-import { saveSession, deleteSession, nameFromText, loadHistory, saveDocument, loadDocument, removeDocument } from "./lib/history.js";
+import { saveSession, deleteSession, nameFromText, loadHistory, saveDocument, loadDocument, removeDocument, useAccount } from "./lib/history.js";
 import { openingScreen } from "./screens/opening.js";
 import { homeScreen } from "./screens/home.js";
 import { studyScreen } from "./screens/study.js";
@@ -13,8 +13,9 @@ import { finishedScreen } from "./screens/finished.js";
 import { historyScreen, SORTS } from "./screens/history.js";
 import { loadingView } from "./components/loading.js";
 import { loginScreen } from "./screens/login.js";
+import { privacyScreen } from "./screens/privacy.js";
 import { accountButton } from "./components/accountButton.js";
-import { setUpAuth, signInWithGoogle, signUp, logIn, sendPasswordReset, setNewPassword, logOut } from "./lib/auth.js";
+import { setUpAuth, signInWithGoogle, signUp, logIn, sendPasswordReset, setNewPassword, logOut, deleteAccount, supabaseClient } from "./lib/auth.js";
 
 const SORT_KEY = "studymode-history-sort";
 
@@ -51,6 +52,7 @@ const freshState = () => ({
   source: "paste", // where this session's text came from: "pdf", "docx", "paste" or "web"
   loginMode: "login", // the sign-in screen's form: "login", "signup", "forgot" or "newPassword"
   returnTo: "home", // the screen to go back to after signing in
+  privacyReturnTo: "home", // the screen to go back to from the privacy page
   authBusy: false,
   authMessage: null, // e.g. "We sent a link to your email"
   error: null,
@@ -66,6 +68,7 @@ const screens = {
   finished: finishedScreen,
   history: historyScreen,
   login: loginScreen,
+  privacy: privacyScreen,
 };
 
 let lastView = "";
@@ -255,10 +258,16 @@ const actions = {
   },
 
   // Continue: back to the start of the next unfinished chunk, with the score so far.
-  resumeSession(id) {
+  // Signed in, the saved text comes from the account, so the loading ring shows meanwhile.
+  async resumeSession(id) {
     const session = loadHistory().find((s) => s.id === id);
-    const chunks = loadDocument(id);
-    if (!session || !chunks) return;
+    if (!session) return;
+    update({ screen: "loading", error: null });
+    const chunks = await loadDocument(id);
+    if (!chunks) {
+      update({ screen: "history", error: "We couldn't load this document. Check your connection and try again." });
+      return;
+    }
     state = {
       ...freshState(),
       chunks,
@@ -274,10 +283,15 @@ const actions = {
 
   // Start over: the same document from chunk 1, as a new session.
   // The old entry stays in history; its saved text moves to the new session.
-  restartSession(id) {
+  async restartSession(id) {
     const session = loadHistory().find((s) => s.id === id);
-    const chunks = loadDocument(id);
-    if (!session || !chunks) return;
+    if (!session) return;
+    update({ screen: "loading", error: null });
+    const chunks = await loadDocument(id);
+    if (!chunks) {
+      update({ screen: "history", error: "We couldn't load this document. Check your connection and try again." });
+      return;
+    }
     state = { ...freshState(), chunks, sessionId: crypto.randomUUID(), name: session.name, source: session.source, restartedFrom: id };
     loadRound();
   },
@@ -377,6 +391,31 @@ const actions = {
     render();
   },
 
+  openPrivacy() {
+    if (state.screen === "privacy") return;
+    update({ screen: "privacy", privacyReturnTo: state.screen, error: null });
+  },
+
+  closePrivacy() {
+    update({ screen: state.privacyReturnTo, error: null });
+  },
+
+  // Deletes the account and everything in it, after a clear warning.
+  async deleteMyAccount() {
+    const sure = confirm(
+      "Delete your account? Your history and saved documents will be deleted for good, on every device. This can't be undone."
+    );
+    if (!sure) return;
+    update({ authBusy: true, error: null });
+    try {
+      await deleteAccount();
+      state = { ...freshState(), screen: "home", authMessage: "Your account and everything in it have been deleted." };
+      render();
+    } catch (err) {
+      update({ authBusy: false, error: err.message });
+    }
+  },
+
   startOver() {
     state = { ...freshState(), screen: "home" };
     render();
@@ -396,7 +435,16 @@ if (fromLink) {
 
 render();
 setUpThemeToggle();
-setUpAuth((event) => {
+// Signed in, history lives in the account; signed out, in this browser.
+// It only switches when the person actually changes, not on every token refresh.
+let historyOwner = null;
+
+setUpAuth((event, person) => {
+  const id = person?.id ?? null;
+  if (id !== historyOwner) {
+    historyOwner = id;
+    useAccount(id ? supabaseClient() : null, render); // redraws again once the account's history is in
+  }
   if (event === "PASSWORD_RECOVERY") {
     update({ screen: "login", loginMode: "newPassword", returnTo: "home", error: null, authMessage: null });
   } else {

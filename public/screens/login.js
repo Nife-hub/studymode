@@ -75,6 +75,8 @@ export function loginScreen(state, actions) {
       el("div", { class: "actions center" }, [
         el("button", { class: "button secondary", type: "button", onClick: () => actions.closeLogin() }, "← Back"),
       ]),
+      el("p", { class: "soft small center" },
+        el("button", { class: "link-button", type: "button", onClick: () => actions.openPrivacy() }, "What we store (privacy)")),
     ]),
   ]);
 }

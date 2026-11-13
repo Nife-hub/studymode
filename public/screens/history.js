@@ -2,7 +2,7 @@
 // Opening one lists its chunks; clicking a chunk shows its questions, marked right or wrong,
 // and clicking a question lets the learner answer it again for revision.
 import { el } from "../lib/dom.js";
-import { loadHistory, loadDocument, documentSize, savedDocumentsSize, formatSize, STORAGE_LIMIT } from "../lib/history.js";
+import { loadHistory, hasDocument, documentSize, savedDocumentsSize, formatSize, STORAGE_LIMIT, historyReady, historyInAccount, syncProblem } from "../lib/history.js";
 import { LETTERS } from "../components/quiz.js";
 
 const percent = (s) => (s.score.total ? s.score.correct / s.score.total : 0);
@@ -16,6 +16,12 @@ export const SORTS = {
 };
 
 export function historyScreen(state, actions) {
+  if (!historyReady()) {
+    return el("main", { class: "screen" }, [
+      el("h1", {}, "Your history"),
+      el("p", { class: "card soft" }, "Loading your history…"),
+    ]);
+  }
   const sessions = loadHistory().sort(SORTS[state.historySort][1]);
   const open = sessions.find((s) => s.id === state.viewingSession);
   if (open) return sessionDetail(open, actions);
@@ -31,6 +37,12 @@ export function historyScreen(state, actions) {
   return el("main", { class: "screen" }, [
     el("button", { class: "button secondary back-button", onClick: () => actions.goTo("home") }, "← Home"),
     el("h1", {}, "Your history"),
+    el("p", { class: "soft small" }, historyInAccount()
+      ? "Saved in your account, so it's on every device you log in on."
+      : "Saved in this browser only. Log in to keep it in your account."),
+    syncProblem() &&
+      el("div", { class: "error", role: "alert" }, el("p", {}, "Some changes couldn't be saved to your account. Check your connection, then refresh the page.")),
+    state.error && el("div", { class: "error", role: "alert" }, el("p", {}, state.error)),
     sessions.length
       ? el("section", {}, [
           storageBar(),
@@ -46,12 +58,14 @@ const formatDate = (iso) => new Date(iso).toLocaleDateString(undefined, { day: "
 const unfinishedTag = (s) =>
   !s.finished && el("span", { class: "unfinished-tag" }, `Unfinished · ${s.chunksDone} of ${s.chunkCount} chunks`);
 
-// How much of the browser's roughly 5 MB the saved documents take.
+// How much of the 5 MB the saved documents take: the account's 5 MB when signed in,
+// otherwise the browser's roughly 5 MB.
 function storageBar() {
   const used = savedDocumentsSize();
   const share = Math.min(100, (used / STORAGE_LIMIT) * 100);
+  const limit = historyInAccount() ? "5 MB" : "about 5 MB";
   return el("div", { class: "storage" }, [
-    el("p", { class: "soft small" }, `Saved documents: ${used ? formatSize(used) : "none"} of about 5 MB`),
+    el("p", { class: "soft small" }, `Saved documents: ${used ? formatSize(used) : "none"} of ${limit}`),
     el("div", { class: "progress-bar storage-bar", role: "img", "aria-label": `${Math.round(share)}% of storage used` },
       el("div", { style: `width: ${share}%` })),
   ]);
@@ -61,7 +75,7 @@ function storageBar() {
 // plus its size and a way to remove it to free space.
 function resumeButtons(s, actions) {
   if (s.finished) return false;
-  if (!loadDocument(s.id)) return el("p", { class: "soft small resume-row" }, "Document not saved");
+  if (!hasDocument(s.id)) return el("p", { class: "soft small resume-row" }, "Document not saved");
   return el("div", { class: "resume-row" }, [
     el("button", { class: "button small-button", onClick: () => actions.resumeSession(s.id) }, "Continue"),
     el("button", { class: "button secondary small-button", onClick: () => actions.restartSession(s.id) }, "Start over"),
